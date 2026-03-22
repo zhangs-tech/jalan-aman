@@ -1,0 +1,17 @@
+import PrismaCommentRepository from "../../repositories/prisma_comment_repository";
+
+export class CreateCommentService {
+  constructor(private readonly commentRepository: PrismaCommentRepository) {}
+
+  async execute(data: { reportID: string; userID: string; details: string }) {
+    if (!data.reportID || !data.userID || !data.details) {
+      throw new Error("Missing required fields for comment creation.");
+    }
+
+    return await this.commentRepository.create({
+      details: data.details,
+      report: { connect: { reportID: data.reportID } },
+      user: { connect: { id: data.userID } },
+    });
+  }
+}
