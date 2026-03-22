@@ -2,9 +2,10 @@
   "name": "@jalan-aman/backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run index.ts"
   },
   "keywords": [],
   "author": "",
@@ -12,12 +13,16 @@
   "packageManager": "pnpm@10.24.0",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "prisma": "^7.5.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@prisma/adapter-libsql": "^7.5.0",
+    "@prisma/client": "^7.5.0",
     "express": "^5.2.1"
   }
 }
