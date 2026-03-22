@@ -11,3 +11,59 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  phone          String
+  hashedPassword String
+  role           String
+
+  reports        Report[]
+  comments       Comment[]
+  reportHistory  ReportHistory[]
+}
+
+model Report {
+  reportID    String   @id @default(uuid())
+  status      String
+  description String
+  reportedAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  imgB64      String
+  reportedBy  String
+  latitude    Float
+  longitude   Float
+  address     String
+  zipCode     String
+
+  user        User            @relation(fields: [reportedBy], references: [id])
+  comments    Comment[]
+  history     ReportHistory[]
+}
+
+model Comment {
+  commentID String   @id @default(uuid())
+  reportID  String
+  userID    String
+  details   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  report    Report   @relation(fields: [reportID], references: [reportID])
+  user      User     @relation(fields: [userID], references: [id])
+}
+
+model ReportHistory {
+  historyID   String @id @default(uuid())
+  reportID    String
+  changedBy   String
+  oldStatus   String
+  newStatus   String
+  imgB64      String
+  details     String
+
+  report      Report @relation(fields: [reportID], references: [reportID])
+  user        User   @relation(fields: [changedBy], references: [id])
+}
