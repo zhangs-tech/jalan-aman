@@ -1,0 +1,262 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Jalan Aman API Documentation",
+    "version": "1.0.0",
+    "description": "API documentation for the Jalan Aman."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["name", "email", "phone", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Registration successful" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login securely",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful. Returns token." },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get my profile",
+        "tags": ["Auth"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User profile successfully retrieved" }
+        }
+      }
+    },
+    "/reports": {
+      "post": {
+        "summary": "Create a new report",
+        "tags": ["Reports"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": { "type": "string" },
+                  "latitude": { "type": "number" },
+                  "longitude": { "type": "number" },
+                  "address": { "type": "string" },
+                  "zipCode": { "type": "string" },
+                  "status": { "type": "string", "example": "Pending" },
+                  "imgB64": { "type": "string" }
+                },
+                "required": ["description", "latitude", "longitude", "address"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Report successfully created" }
+        }
+      },
+      "get": {
+        "summary": "Get all reports",
+        "tags": ["Reports"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of all reports" }
+        }
+      }
+    },
+    "/reports/{id}": {
+      "get": {
+        "summary": "Get a specific report by ID",
+        "tags": ["Reports"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Report details including comments and history" }
+        }
+      }
+    },
+    "/reports/{id}/status": {
+      "patch": {
+        "summary": "Update report status",
+        "tags": ["Reports"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "example": "In Progress" },
+                  "details": { "type": "string", "example": "Sent city worker to inspect." },
+                  "imgB64": { "type": "string" }
+                },
+                "required": ["status", "details"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Status successfully updated" }
+        }
+      }
+    },
+    "/reports/{reportId}/comments": {
+      "post": {
+        "summary": "Create a comment on a report",
+        "tags": ["Comments"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "details": { "type": "string", "example": "This pothole is a menace!" }
+                },
+                "required": ["details"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Comment directly linked to report" }
+        }
+      },
+      "get": {
+        "summary": "Get all comments for a report",
+        "tags": ["Comments"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of comments on report" }
+        }
+      }
+    },
+    "/reports/{reportId}/comments/{commentId}": {
+      "patch": {
+        "summary": "Update an existing comment",
+        "tags": ["Comments"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "details": { "type": "string" }
+                },
+                "required": ["details"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Comment securely updated" }
+        }
+      }
+    }
+  }
+}
