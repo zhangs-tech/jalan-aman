@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:jalan_aman/components/buttons.dart';
 import 'package:jalan_aman/components/text_field.dart';
 import 'package:jalan_aman/pages/home_page.dart';
@@ -51,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      print(result);
+      // print(result);
 
       if (!mounted) return;
       final statusCode = result["statusCode"];
