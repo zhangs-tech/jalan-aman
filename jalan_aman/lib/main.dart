@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jalan_aman/pages/landing_page.dart';
 import 'package:jalan_aman/services/location_service.dart';
 import 'package:jalan_aman/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   LocationService.checkLocationService();
   runApp(const MyApp());
 }
