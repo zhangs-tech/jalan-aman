@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jalan_aman/components/buttons.dart';
 import 'package:jalan_aman/components/text_field.dart';
+import 'package:jalan_aman/pages/home_page.dart';
 import 'package:jalan_aman/pages/register_page.dart';
+import 'package:jalan_aman/services/api/auth_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
 import 'package:jalan_aman/utils/form_validator.dart';
 
@@ -29,15 +32,51 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _onLogin() async {
+    if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
     setState(() {
       _isLoading = true;
     });
 
-    //TODO: API CALL
-    setState(() {
-      _isLoading = false;
-    });
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text("Logging in"),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    try {
+      final result = await AuthService.login(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      print(result);
+
+      if (!mounted) return;
+      final statusCode = result["statusCode"];
+
+      messenger.hideCurrentSnackBar();
+      if (statusCode == 200) {
+        messenger.showSnackBar(const SnackBar(content: Text("Login Success")));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else if (statusCode == 401) {
+        messenger.showSnackBar(const SnackBar(content: Text("Login Failed")));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(const SnackBar(content: Text("Connection Error")));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
