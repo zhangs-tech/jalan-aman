@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jalan_aman/pages/login_page.dart';
+import 'package:jalan_aman/pages/register_page.dart';
 import '../components/app_icon.dart';
 import '../components/buttons.dart';
 import '../theme/theme.dart';
@@ -10,10 +12,12 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Force light status bar icons on dark green background
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.primary,
@@ -22,7 +26,7 @@ class LandingPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Column(
             children: [
-              // ── Center content ──────────────────────────────
+              // Center content
               const Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -34,27 +38,37 @@ class LandingPage extends StatelessWidget {
                 ),
               ),
 
-              // ── Bottom buttons ──────────────────────────────
+              // Bottom buttons
               Column(
                 children: [
                   Buttons(
                     onPressed: () {
-                      // TODO: Navigator.pushNamed(context, '/register');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
+                        ),
+                      );
                     },
-                    label: 'Daftar',
+                    label: 'Register',
                     type: ButtonType.primary,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Buttons(
                     onPressed: () {
-                      // TODO: Navigator.pushNamed(context, '/login');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                      );
                     },
-                    label: 'Masuk',
-                    type: ButtonType.inverted,
+                    label: 'Login',
+                    type: ButtonType.outlined,
                   ),
                 ],
               ),
-              SizedBox(height: AppSpacing.xl),
+              SizedBox(height: AppSpacing.xxl),
             ],
           ),
         ),

@@ -35,7 +35,7 @@ class Buttons extends StatelessWidget {
               elevation: 0,
               textStyle: AppTextStyles.button,
               shape: const RoundedRectangleBorder(
-                borderRadius: AppRadius.pillRadius,
+                borderRadius: AppRadius.inputRadius,
               ),
             ),
             child: Text(label),
@@ -48,7 +48,7 @@ class Buttons extends StatelessWidget {
               elevation: 0,
               textStyle: AppTextStyles.button,
               shape: const RoundedRectangleBorder(
-                borderRadius: AppRadius.pillRadius,
+                borderRadius: AppRadius.cardRadius,
               ),
             ),
             child: Text(label),
@@ -66,19 +66,19 @@ class Buttons extends StatelessWidget {
       case ButtonType.inverted:
         return AppColors.primaryDark;
       case ButtonType.outlined:
-        return AppColors.surface;
+        return Colors.transparent;
     }
   }
 
   Color get _foregroundColor {
     switch (type) {
       case ButtonType.primary:
-        return Colors.white;
+        return AppColors.primaryDark;
       case ButtonType.inverted:
         return AppColors.textInverse;
       case ButtonType.secondary:
       case ButtonType.outlined:
-        return AppColors.textPrimary;
+        return AppColors.textInverse;
     }
   }
 }
