@@ -1,4 +1,5 @@
 import 'package:jalan_aman/services/api/api_client.dart';
+import 'package:jalan_aman/services/secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
@@ -31,7 +32,7 @@ class AuthService {
       final user = data['user'] as Map<String, dynamic>?;
       final prefs = await SharedPreferences.getInstance();
       if (accessToken != null) {
-        await prefs.setString('accessToken', accessToken);
+        await SecureStorage.write('accessToken', accessToken);
       }
       if (user != null) {
         await prefs.setString('userId', user['id']?.toString() ?? '');
@@ -43,5 +44,13 @@ class AuthService {
     }
 
     return result;
+  }
+
+  static Future<bool> isAuthenticated() async {
+    final token = await SecureStorage.read('accessToken');
+    if (token == null || token.isEmpty) return false;
+
+    final result = await ApiClient.get('/auth/me', auth: true);
+    return result['statusCode'] == 200;
   }
 }
