@@ -6,7 +6,7 @@ export class AuthController {
   constructor(
     private readonly registerService: RegisterService,
     private readonly loginService: LoginService,
-  ) { }
+  ) {}
 
   async register(
     req: Request,
@@ -19,6 +19,7 @@ export class AuthController {
         .status(201)
         .json({ message: "Registration successful", user: result });
     } catch (error) {
+      res.status(409).json({ message: "Email already registered" });
       next(error as Error);
     }
   }
