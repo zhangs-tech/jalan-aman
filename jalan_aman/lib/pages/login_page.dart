@@ -198,7 +198,7 @@ class _FormCard extends StatelessWidget {
 
             Buttons(
               onPressed: onLogin,
-              label: 'Register',
+              label: 'Login',
               type: ButtonType.inverted,
             ),
             const SizedBox(height: AppSpacing.base),
