@@ -5,7 +5,6 @@ import 'package:jalan_aman/pages/home_page.dart';
 import 'package:jalan_aman/pages/landing_page.dart';
 import 'package:jalan_aman/services/api/auth_service.dart';
 import 'package:jalan_aman/services/location_service.dart';
-import 'package:jalan_aman/theme/app_theme.dart';
 import 'package:jalan_aman/theme/theme.dart';
 
 Future<void> main() async {
