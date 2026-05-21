@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jalan_aman/pages/landing_page.dart';
+import 'package:jalan_aman/services/location_service.dart';
 import 'package:jalan_aman/theme/app_theme.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  LocationService.checkLocationService();
   runApp(const MyApp());
 }
 
