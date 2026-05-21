@@ -6,7 +6,7 @@ class AppIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    const imagePath = '../../assets/icon.png'; 
+    const imagePath = 'assets/icon.png'; 
     return Container(
       width: 80,
       height: 80,
