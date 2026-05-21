@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jalan_aman/components/buttons.dart';
 import 'package:jalan_aman/components/text_field.dart';
 import 'package:jalan_aman/pages/login_page.dart';
+import 'package:jalan_aman/services/api/auth_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
 import 'package:jalan_aman/utils/form_validator.dart';
 
@@ -33,15 +34,60 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> _onRegister() async {
+    if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
     setState(() {
       _isLoading = true;
     });
 
-    //TODO: API CALL
-    setState(() {
-      _isLoading = false;
-    });
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Signing Up'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    try {
+      final result = await AuthService.register(
+        name: _nameController.text,
+        phone: _phoneController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      // print(result);
+
+      if (!mounted) return;
+
+      final statusCode = result["statusCode"];
+      // final data = result["data"];
+
+      messenger.hideCurrentSnackBar();
+      if (statusCode == 201) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text("Register Success")),
+        );
+        Navigator.pop(context);
+      } else if (statusCode == 409) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Email already registered')),
+        );
+      } else {
+        messenger.showSnackBar(
+          const SnackBar(content: Text("Connection error")),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(const SnackBar(content: Text("Connection Error")));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
