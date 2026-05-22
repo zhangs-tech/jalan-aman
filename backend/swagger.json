@@ -256,6 +256,30 @@
         "responses": {
           "200": { "description": "Comment securely updated" }
         }
+      },
+      "delete": {
+        "summary": "Delete a comment",
+        "tags": ["Comments"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Comment successfully deleted" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Comment or Report not found" }
+        }
       }
     }
   }
