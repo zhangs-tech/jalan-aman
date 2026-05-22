@@ -51,7 +51,7 @@ class _BottomNav extends StatelessWidget {
         NavigationDestination(
           icon: Icon(Icons.list_alt_outlined),
           selectedIcon: Icon(Icons.list_alt_rounded, color: Colors.white),
-          label: 'Laporan',
+          label: 'Report',
         ),
         NavigationDestination(
           icon: Icon(Icons.map_outlined),
@@ -61,7 +61,7 @@ class _BottomNav extends StatelessWidget {
         NavigationDestination(
           icon: Icon(Icons.person_outline_rounded),
           selectedIcon: Icon(Icons.person_rounded, color: Colors.white),
-          label: 'Profil',
+          label: 'Profile',
         ),
       ],
     );
