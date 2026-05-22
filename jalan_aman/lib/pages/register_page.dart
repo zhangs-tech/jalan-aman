@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jalan_aman/components/buttons.dart';
+import 'package:jalan_aman/components/card.dart';
 import 'package:jalan_aman/components/text_field.dart';
 import 'package:jalan_aman/pages/login_page.dart';
 import 'package:jalan_aman/services/api/auth_service.dart';
@@ -153,14 +154,8 @@ class _FormCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.cardRadius,
-        boxShadow: AppShadows.card,
-      ),
-      child: Form(
+    return Cards(
+       child: Form(
         key: formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
@@ -269,6 +264,7 @@ class _FormCard extends StatelessWidget {
           ],
         ),
       ),
+
     );
   }
 }
