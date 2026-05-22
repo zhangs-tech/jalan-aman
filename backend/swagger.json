@@ -102,7 +102,16 @@
                   "status": { "type": "string", "example": "Pending" },
                   "imgB64": { "type": "string" }
                 },
-                "required": ["description", "latitude", "longitude", "address"]
+                "required": ["description", "latitude", "longitude", "address"],
+                "example": {
+                  "description": "Large pothole in the middle of the road",
+                  "latitude": 3.1390,
+                  "longitude": 101.6869,
+                  "address": "Jalan Aman, Kuala Lumpur",
+                  "zipCode": "50000",
+                  "status": "Pending",
+                  "imgB64": ""
+                }
               }
             }
           }
