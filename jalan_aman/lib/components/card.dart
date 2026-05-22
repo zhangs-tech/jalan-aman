@@ -4,14 +4,21 @@ import 'package:jalan_aman/theme/theme.dart';
 enum Spacing { xs, sm, md, base, lg, xl, xxl, xxxl }
 
 class Cards extends StatelessWidget {
-  const Cards({super.key, this.appSpacing = Spacing.xl, this.child});
+  const Cards({
+    super.key,
+    this.height,
+    this.appSpacing = Spacing.xl,
+    this.child,
+  });
 
+  final double? height;
   final Spacing appSpacing;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height,
       padding: EdgeInsets.all(_appSpacing),
       decoration: BoxDecoration(
         color: AppColors.surface,
