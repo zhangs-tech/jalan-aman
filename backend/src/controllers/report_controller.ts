@@ -3,13 +3,15 @@ import type { CreateReportService } from "../services/report/create_report_servi
 import type { GetAllReportsService } from "../services/report/get_all_reports_service";
 import type { GetReportByIdService } from "../services/report/get_report_by_id_service";
 import type { UpdateReportStatusService } from "../services/report/update_report_status_service";
+import type { GetReportsByUserService } from "../services/report/get_reports_by_user_service";
 
 export class ReportController {
   constructor(
     private readonly createReportService: CreateReportService,
     private readonly getAllReportsService: GetAllReportsService,
     private readonly getReportByIdService: GetReportByIdService,
-    private readonly updateReportStatusService: UpdateReportStatusService
+    private readonly updateReportStatusService: UpdateReportStatusService,
+    private readonly getReportsByUserService: GetReportsByUserService
   ) { }
 
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -34,6 +36,19 @@ export class ReportController {
   async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const reports = await this.getAllReportsService.execute();
+      res.status(200).json({ reports });
+    } catch (error) {
+      next(error as Error);
+    }
+  }
+
+  async getByUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+      const reports = await this.getReportsByUserService.execute(req.user.id);
       res.status(200).json({ reports });
     } catch (error) {
       next(error as Error);

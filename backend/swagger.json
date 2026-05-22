@@ -129,6 +129,17 @@
         }
       }
     },
+    "/reports/user/me": {
+      "get": {
+        "summary": "Get all reports created by the authenticated user",
+        "tags": ["Reports"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of reports created by the user" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
     "/reports/{id}": {
       "get": {
         "summary": "Get a specific report by ID",

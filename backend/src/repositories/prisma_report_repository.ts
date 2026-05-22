@@ -18,6 +18,18 @@ export default class PrismaReportRepository {
     });
   }
 
+  async findByUserId(userId: string) {
+    return await this.prisma.report.findMany({
+      where: { reportedBy: userId },
+      orderBy: { reportedAt: 'desc' },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      }
+    });
+  }
+
   async findById(reportID: string) {
     return await this.prisma.report.findUnique({
       where: { reportID },
