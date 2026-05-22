@@ -102,7 +102,16 @@
                   "status": { "type": "string", "example": "Pending" },
                   "imgB64": { "type": "string" }
                 },
-                "required": ["description", "latitude", "longitude", "address"]
+                "required": ["description", "latitude", "longitude", "address"],
+                "example": {
+                  "description": "Large pothole in the middle of the road",
+                  "latitude": 3.1390,
+                  "longitude": 101.6869,
+                  "address": "Jalan Aman, Kuala Lumpur",
+                  "zipCode": "50000",
+                  "status": "Pending",
+                  "imgB64": ""
+                }
               }
             }
           }
@@ -117,6 +126,17 @@
         "security": [{ "BearerAuth": [] }],
         "responses": {
           "200": { "description": "List of all reports" }
+        }
+      }
+    },
+    "/reports/user/me": {
+      "get": {
+        "summary": "Get all reports created by the authenticated user",
+        "tags": ["Reports"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of reports created by the user" },
+          "401": { "description": "Unauthorized" }
         }
       }
     },
@@ -255,6 +275,30 @@
         },
         "responses": {
           "200": { "description": "Comment securely updated" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a comment",
+        "tags": ["Comments"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Comment successfully deleted" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Comment or Report not found" }
         }
       }
     }

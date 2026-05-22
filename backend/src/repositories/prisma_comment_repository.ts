@@ -31,4 +31,10 @@ export default class PrismaCommentRepository {
       data: { details }
     });
   }
+
+  async delete(commentID: string) {
+    return await this.prisma.comment.delete({
+      where: { commentID }
+    });
+  }
 }
