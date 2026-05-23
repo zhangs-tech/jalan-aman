@@ -1,12 +1,12 @@
 # Delete Report Use Case
 
-Only the OP (original poster) can delete their report.
+Only the OP (original poster) can soft-delete their report. The report and its associated data are retained in the database but excluded from normal queries (map, history) unless explicitly requested.
 
 ## Flow
 
 1. OP navigates to their report
 2. OP deletes the report
-3. Report and its associated votes, comments, and attachments are removed
+3. Report's `deletedAt` is set to the current timestamp; the report is excluded from map and history views
 
 ## Endpoints
 
@@ -18,10 +18,12 @@ User must be the `reportedBy` user.
 
 #### Response
 
-`204 No Content`
+`200 OK`
 
 ```json
-{}
+{
+    "message": "Report deleted"
+}
 ```
 
 #### Failure Responses

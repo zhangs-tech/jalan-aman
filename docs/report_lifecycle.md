@@ -42,6 +42,6 @@ Confirm and resolve votes are tracked independently, casting one does not block 
 
 ## Report Expiration
 
-When `expiresAt` ≤ now, the report is automatically marked as expired and removed from the map.
+When `expiresAt` ≤ now on read, the report is considered expired and excluded from map queries.
 
 Expired reports can still be accessed in the report history for reference.
