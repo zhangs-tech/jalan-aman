@@ -24,20 +24,24 @@
 
 Other: 6 hours
 
-## Report Upvote
+## Report Confirm
 
-User taps "Still an Issue"
+User taps "Still an Issue" → type: `confirm`
 
-This extends the report's time to live by 1 hour, up to a maximum of 48 hours. Each user can only upvote a report once within a 24-hour period.
+Extends `expiresAt` by 1 hour, up to 48 hours past `createdAt`. Rate-limited: the same user may cast at most one confirm vote per report per 24-hour rolling window.
 
-## Report Resolution
+Confirm and resolve votes are tracked independently, casting one does not block the other.
 
-User taps "Resolved"
+## Report Resolve
 
-This shortens the report's time to live by 1 hour, down to a minimum of 1 hour. Each user can only mark a report as resolved once within a 24-hour period.
+User taps "Resolved" → type: `resolve`
+
+Shortens `expiresAt` by 1 hour, down to 1 hour past `createdAt`. Rate-limited: the same user may cast at most one resolve vote per report per 24-hour rolling window. 
+
+Confirm and resolve votes are tracked independently, casting one does not block the other.
 
 ## Report Expiration
 
-When a report's time to live reaches zero, it is automatically marked as expired and removed from the map.
+When `expiresAt` ≤ now, the report is automatically marked as expired and removed from the map.
 
 Expired reports can still be accessed in the report history for reference.
