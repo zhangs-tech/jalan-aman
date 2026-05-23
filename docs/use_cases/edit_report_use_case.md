@@ -14,7 +14,7 @@ OP (original poster) can edit their own report. OP must be physically at the rep
 
 **REQUIRES AUTHENTICATED USER**
 
-OP must be the `reportedBy` user and must be within proximity of the report's coordinates.
+OP must be the `reportedBy` user and must be within 100 meters of the report's coordinates.
 
 #### Request Body
 
@@ -74,8 +74,8 @@ classDiagram
 
 | Status | Condition |
 |--------|-----------|
-| `400` | Missing required fields or invalid values |
+| `400` | Missing required fields or invalid values (description max 256 chars, address max 256 chars) |
 | `401` | Missing or invalid authentication |
 | `403` | Authenticated user is not the OP |
 | `404` | Report not found |
-| `409` | User is not within required proximity of the report location |
+| `409` | User is not within 100 meters of the report location |
