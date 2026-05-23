@@ -4,6 +4,8 @@ A new user creates an account.
 
 Password is hashed with bcrypt (10 salt rounds) before storage. The `role` defaults to `"user"`.
 
+Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, and one digit.
+
 ## Flow
 
 1. User opens the registration screen
@@ -72,5 +74,5 @@ classDiagram
 
 | Status | Condition |
 |--------|-----------|
-| `400` | Missing required fields (`email`, `password`, `name`, `phone`) |
+| `400` | Missing required fields, invalid email format, invalid phone format, or password does not meet strength requirements |
 | `409` | Email already registered |

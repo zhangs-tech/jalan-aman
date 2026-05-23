@@ -2,7 +2,7 @@
 
 A registered user authenticates and receives a JWT access token.
 
-The token is signed with HS256, contains `{ id, email, role }` in the payload, and expires after 1 hour. The token is returned in the JSON response body — the client is responsible for storing it and attaching it to subsequent requests as `Authorization: Bearer <token>`.
+The token is signed with RS256 (RSA SHA-256), contains `{ id, email, role }` in the payload, and expires after 1 hour. The private key is held by the server; the corresponding public key is used for verification. The token is returned in the JSON response body — the client is responsible for storing it and attaching it to subsequent requests as `Authorization: Bearer <token>`.
 
 ## Flow
 
