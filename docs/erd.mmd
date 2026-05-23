@@ -15,6 +15,7 @@ erDiagram
     datetime createdAt
     datetime updatedAt
     datetime expiresAt
+    datetime deletedAt "optional, soft-delete"
     string reportedBy "uuid"
     float latitude
     float longitude
@@ -23,9 +24,10 @@ erDiagram
   }
 
   ReportVote {
-    string reportId PK, FK "uuid"
-    string userId PK, FK "uuid"
-    string type PK "'confirm' | 'resolve'"
+    string id PK "uuid"
+    string reportId FK "uuid"
+    string userId FK "uuid"
+    string type "'confirm' | 'resolve'"
     datetime createdAt
   }
 
