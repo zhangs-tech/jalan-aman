@@ -44,7 +44,7 @@ Valid `reportType` values:
     "latitude": 40.205, // float number
     "longitude": 21.443,
     "address": "address", // max 256 chars
-    "zipcode": "51030", // optional
+    "zipCode": "51030", // optional
     "attachment": true
 }
 ```
@@ -57,7 +57,7 @@ classDiagram
         +float latitude
         +float longitude
         +string address
-        +string? zipcode
+        +string? zipCode
         +bool attachment
     }
 ```
@@ -77,7 +77,7 @@ classDiagram
         "latitude": 40.205,
         "longitude": 21.443,
         "address": "address",
-        "zipcode": "51030"
+        "zipCode": "51030"
     },
     "attachment": { // only if "attachment": true
         "id": "uuid",
@@ -105,7 +105,7 @@ classDiagram
         +float latitude
         +float longitude
         +string address
-        +string? zipcode
+        +string? zipCode
     }
     class AttachmentUploadDTO {
         +string id

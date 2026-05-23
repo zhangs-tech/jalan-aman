@@ -48,7 +48,7 @@ classDiagram
         "latitude": 40.205,
         "longitude": 21.443,
         "address": "updated address",
-        "zipcode": "51030"
+        "zipCode": "51030"
     }
 }
 ```
@@ -66,7 +66,7 @@ classDiagram
         +float latitude
         +float longitude
         +string address
-        +string? zipcode
+        +string? zipCode
     }
 ```
 
