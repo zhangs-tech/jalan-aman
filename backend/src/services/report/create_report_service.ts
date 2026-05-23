@@ -1,10 +1,11 @@
+import { ReportStatus } from "../../generated/prisma/client";
 import PrismaReportRepository from "../../repositories/prisma_report_repository";
 
 export class CreateReportService {
   constructor(private readonly reportRepository: PrismaReportRepository) {}
 
   async execute(data: {
-    status: string;
+    status: ReportStatus;
     description: string;
     imgB64: string;
     reportedBy: string;
@@ -18,7 +19,7 @@ export class CreateReportService {
     }
 
     return await this.reportRepository.create({
-      status: data.status || "Pending",
+      status: data.status || ReportStatus.PENDING,
       description: data.description,
       imgB64: data.imgB64 || "",
       latitude: data.latitude,

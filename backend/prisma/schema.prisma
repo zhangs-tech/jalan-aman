@@ -25,9 +25,17 @@ model User {
   reportHistory  ReportHistory[]
 }
 
+enum ReportStatus {
+  PENDING
+  UNDER_REVIEW
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
 model Report {
-  reportID    String   @id @default(uuid())
-  status      String
+  reportID    String       @id @default(uuid())
+  status      ReportStatus
   description String
   reportedAt  DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -56,11 +64,11 @@ model Comment {
 }
 
 model ReportHistory {
-  historyID   String @id @default(uuid())
+  historyID   String       @id @default(uuid())
   reportID    String
   changedBy   String
-  oldStatus   String
-  newStatus   String
+  oldStatus   ReportStatus
+  newStatus   ReportStatus
   imgB64      String
   details     String
 

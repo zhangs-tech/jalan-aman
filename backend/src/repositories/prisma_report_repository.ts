@@ -1,4 +1,4 @@
-import type { PrismaClient, Prisma } from "../generated/prisma/client";
+import type { PrismaClient, Prisma, ReportStatus } from "../generated/prisma/client";
 
 export default class PrismaReportRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -50,7 +50,7 @@ export default class PrismaReportRepository {
     });
   }
 
-  async updateStatus(reportID: string, newStatus: string, changedBy: string, details: string, imgB64?: string) {
+  async updateStatus(reportID: string, newStatus: ReportStatus, changedBy: string, details: string, imgB64?: string) {
     return await this.prisma.$transaction(async (tx) => {
       const report = await tx.report.findUnique({ where: { reportID } });
       if (!report) throw new Error("Report not found");
