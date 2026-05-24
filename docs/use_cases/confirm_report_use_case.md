@@ -14,24 +14,15 @@ Rate-limited: one confirm per user per report per 24-hour rolling window.
 
 ## Endpoints
 
-### POST `/reports/:reportId/vote`
+### POST `/reports/:reportId/confirm`
 
 **REQUIRES AUTHENTICATED USER**
 
+No request body required.
+
 #### Request Body
 
-```json
-{
-    "type": "confirm"
-}
-```
-
-```mermaid
-classDiagram
-    class VoteDTO {
-        +string type
-    }
-```
+_None_
 
 #### Response
 
@@ -90,7 +81,6 @@ classDiagram
 
 | Status | Condition |
 |--------|-----------|
-| `400` | Invalid or missing vote type |
 | `401` | Missing or invalid authentication |
 | `404` | Report not found |
 | `409` | Already voted confirm within 24h window |
