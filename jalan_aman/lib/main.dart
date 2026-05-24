@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jalan_aman/components/app_icon.dart';
 import 'package:jalan_aman/pages/home_page.dart';
 import 'package:jalan_aman/pages/landing_page.dart';
 import 'package:jalan_aman/services/api/auth_service.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
       title: 'Jalan Aman',
       // debugShowCheckedModeBanner: false,
       theme: theme.copyWith(textTheme: textTheme),
-      home: const LandingPage(),
+      home: const _AuthGate(),
     );
   }
 }
@@ -52,11 +53,11 @@ class _AuthGateState extends State<_AuthGate> {
     final authenticated = await AuthService.isAuthenticated();
     if (!mounted) return;
 
-    Navigator.pushReplacement(
-      context,
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (_) => authenticated ? const HomePage() : const LandingPage(),
       ),
+      (_) => false,
     );
   }
 
@@ -64,7 +65,9 @@ class _AuthGateState extends State<_AuthGate> {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: AppColors.primary,
-      body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      body: Center(
+        child: AppIcon(),
+        ),
     );
   }
 }
