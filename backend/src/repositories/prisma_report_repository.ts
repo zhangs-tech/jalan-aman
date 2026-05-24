@@ -60,6 +60,12 @@ export type PinResult = {
   longitude: number;
 };
 
+export type ReportDetailResult = ReportDTO & {
+  attachments: AttachmentDTO[];
+  votes: Array<{ type: string; userId: string }>;
+  _count: { comments: number };
+};
+
 export default class PrismaReportRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -100,6 +106,21 @@ export default class PrismaReportRepository {
     return (await this.prisma.report.findUnique({
       where: { id },
     })) as ReportDTO | null;
+  }
+
+  async findDetailById(id: string): Promise<ReportDetailResult | null> {
+    return (await this.prisma.report.findUnique({
+      where: { id },
+      include: {
+        attachments: true,
+        votes: {
+          select: { type: true, userId: true },
+        },
+        _count: {
+          select: { comments: true },
+        },
+      },
+    })) as ReportDetailResult | null;
   }
 
   async softDelete(id: string): Promise<void> {

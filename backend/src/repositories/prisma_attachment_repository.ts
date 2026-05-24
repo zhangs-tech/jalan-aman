@@ -8,7 +8,7 @@ export default class PrismaAttachmentRepository {
       where: { id },
       include: {
         report: {
-          select: { reportedBy: true },
+          select: { id: true },
         },
       },
     });

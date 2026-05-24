@@ -5,6 +5,8 @@ import type { DeleteReportService } from "../services/report/delete_report_servi
 import type { VoteReportService } from "../services/report/vote_report_service";
 import type { ListReportsService } from "../services/report/list_reports_service";
 import type { MapPinsService } from "../services/report/map_pins_service";
+import type { GetReportDetailService } from "../services/report/get_report_detail_service";
+import type { GetAttachmentDownloadService } from "../services/report/get_attachment_download_service";
 import JwtService from "../services/auth/jwt_service";
 import { UnauthorizedError } from "../errors";
 
@@ -17,7 +19,9 @@ export class ReportController {
     private readonly deleteReportService: DeleteReportService,
     private readonly voteReportService: VoteReportService,
     private readonly listReportsService: ListReportsService,
-    private readonly mapPinsService: MapPinsService
+    private readonly mapPinsService: MapPinsService,
+    private readonly getReportDetailService: GetReportDetailService,
+    private readonly getAttachmentDownloadService: GetAttachmentDownloadService
   ) {}
 
   async create(req: Request, res: Response): Promise<void> {
@@ -42,9 +46,22 @@ export class ReportController {
     res.status(501).json({ message: "Not implemented" });
   }
 
-  async getById(_req: Request, res: Response): Promise<void> {
-    // TODO: implement in future use case
-    res.status(501).json({ message: "Not implemented" });
+  async getById(req: Request, res: Response): Promise<void> {
+    const userId = await this.tryGetUserId(req);
+    const { id } = req.params;
+    const result = await this.getReportDetailService.execute(id as string, userId);
+
+    res.status(200).json(result);
+  }
+
+  async downloadAttachment(req: Request, res: Response): Promise<void> {
+    const { reportId, attachmentId } = req.params;
+    const result = await this.getAttachmentDownloadService.execute(
+      reportId as string,
+      attachmentId as string
+    );
+
+    res.status(200).json(result);
   }
 
   async getMap(req: Request, res: Response): Promise<void> {
