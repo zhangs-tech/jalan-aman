@@ -70,16 +70,6 @@ export class ReportController {
     res.status(200).json(result);
   }
 
-  async updateStatus(_req: Request, res: Response): Promise<void> {
-    // TODO: implement in future use case
-    res.status(501).json({ message: "Not implemented" });
-  }
-
-  async confirmAttachment(_req: Request, res: Response): Promise<void> {
-    // TODO: implement in future use case (kept for backward compatibility)
-    res.status(501).json({ message: "Not implemented" });
-  }
-
   async delete(req: Request, res: Response): Promise<void> {
     if (!req.user) {
       throw new UnauthorizedError("Unauthorized");

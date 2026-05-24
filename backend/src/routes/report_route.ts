@@ -65,15 +65,9 @@ reportRouter.put("/:id", authMiddleware, (req, res) =>
 reportRouter.delete("/:id", authMiddleware, (req, res) =>
   reportController.delete(req, res)
 );
-reportRouter.patch("/:id/status", authMiddleware, (req, res) =>
-  reportController.updateStatus(req, res)
-);
 reportRouter.post("/:reportId/confirm", authMiddleware, (req, res) =>
   reportController.confirm(req, res)
 );
 reportRouter.post("/:reportId/resolve", authMiddleware, (req, res) =>
   reportController.resolve(req, res)
-);
-reportRouter.post("/:reportId/attachments/:attachmentId/confirm", authMiddleware, (req, res) =>
-  reportController.confirmAttachment(req, res)
 );
