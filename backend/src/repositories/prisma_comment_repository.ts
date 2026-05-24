@@ -52,20 +52,22 @@ export default class PrismaCommentRepository {
     cursor?: string,
     limit: number = 20
   ): Promise<PaginatedCommentsResult> {
-    const take = limit + 1;
-
-    const where: Record<string, unknown> = { reportId };
-
+    let cursorClause: { cursor: { createdAt: Date; id: string }; skip: number } | Record<string, never> = {};
     if (cursor) {
-      const cursorDate = new Date(Buffer.from(cursor, "base64").toString("utf-8"));
-      where.createdAt = { gt: cursorDate };
+      const parsed: { createdAt: string; id: string } = JSON.parse(
+        Buffer.from(cursor, "base64").toString("utf-8")
+      );
+      cursorClause = {
+        cursor: { createdAt: new Date(parsed.createdAt), id: parsed.id },
+        skip: 1,
+      };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rows = (await this.prisma.comment.findMany({
-      where: where as any,
-      orderBy: { createdAt: "asc" },
-      take,
+      where: { reportId },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      take: limit + 1,
+      ...cursorClause,
       include: {
         user: { select: { id: true, name: true } },
       },
@@ -74,7 +76,12 @@ export default class PrismaCommentRepository {
     const hasMore = rows.length > limit;
     const comments = hasMore ? rows.slice(0, limit) : rows;
     const nextCursor = hasMore
-      ? Buffer.from(comments[comments.length - 1]!.createdAt.toISOString()).toString("base64")
+      ? Buffer.from(
+          JSON.stringify({
+            createdAt: comments[comments.length - 1]!.createdAt.toISOString(),
+            id: comments[comments.length - 1]!.id,
+          })
+        ).toString("base64")
       : null;
 
     return { comments, nextCursor };
