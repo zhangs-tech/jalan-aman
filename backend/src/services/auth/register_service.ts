@@ -1,33 +1,15 @@
 import bcrypt from "bcrypt";
 import type PrismaUserRepository from "../../repositories/prisma_user_repository";
-import { BadRequestError, ConflictError } from "../../errors";
-
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  name: string;
-  phone: string;
-}
-
-export interface RegisterResponse {
-  id: string;
-  email: string;
-  name: string;
-  phone: string;
-  role: string;
-}
+import { ConflictError } from "../../errors";
+import { validateRegister } from "../../dtos/auth-register.dto";
+import type { AuthRegisterResponse } from "../../dtos/auth-register.dto";
+import type { UserDTO } from "../../dtos/user.dto";
 
 export class RegisterService {
-  constructor(private readonly userRepository: PrismaUserRepository) { }
+  constructor(private readonly userRepository: PrismaUserRepository) {}
 
-  async execute(data: RegisterRequest): Promise<RegisterResponse> {
-    const { email, password, name, phone } = data;
-
-    if (!email || !password || !name || !phone) {
-      throw new BadRequestError(
-        "Missing required fields: email, password, name, phone",
-      );
-    }
+  async execute(input: unknown): Promise<AuthRegisterResponse> {
+    const { email, password, name, phone } = validateRegister(input);
 
     const existingUser = await this.userRepository.findByEmail(email);
 
@@ -46,12 +28,17 @@ export class RegisterService {
       role: "user",
     });
 
-    return {
+    const userDto: UserDTO = {
       id: user.id,
       email: user.email,
       name: user.name,
       phone: user.phone,
       role: user.role,
+    };
+
+    return {
+      message: "Registration successful",
+      user: userDto,
     };
   }
 }

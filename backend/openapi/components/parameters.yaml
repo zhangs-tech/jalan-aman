@@ -1,0 +1,76 @@
+# Reusable parameters.
+
+ReportId:
+  name: reportId
+  in: path
+  required: true
+  description: Report unique identifier
+  schema:
+    type: string
+    format: uuid
+
+CommentId:
+  name: commentId
+  in: path
+  required: true
+  description: Comment unique identifier
+  schema:
+    type: string
+    format: uuid
+
+AttachmentId:
+  name: attachmentId
+  in: path
+  required: true
+  description: Attachment unique identifier
+  schema:
+    type: string
+    format: uuid
+
+Cursor:
+  name: cursor
+  in: query
+  required: false
+  description: Opaque pagination cursor; omit for the first page
+  schema:
+    type: string
+
+Limit:
+  name: limit
+  in: query
+  required: false
+  description: Page size
+  schema:
+    type: integer
+    minimum: 1
+    default: 20
+    # Max depends on context (50 for reports, 100 for comments)
+
+ReportType:
+  name: reportType
+  in: query
+  required: false
+  description: Comma-separated report types to filter by
+  schema:
+    type: string
+    example: accident,flood
+
+Sort:
+  name: sort
+  in: query
+  required: false
+  description: Field to sort by
+  schema:
+    type: string
+    enum: [createdAt, expiresAt]
+    default: createdAt
+
+Order:
+  name: order
+  in: query
+  required: false
+  description: Sort direction
+  schema:
+    type: string
+    enum: [asc, desc]
+    default: desc

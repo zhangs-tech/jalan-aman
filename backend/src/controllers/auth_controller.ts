@@ -11,12 +11,12 @@ export class AuthController {
 
   async register(req: Request, res: Response): Promise<void> {
     const result = await this.registerService.execute(req.body);
-    res.status(201).json({ message: "Registration successful", user: result });
+    res.status(201).json(result);
   }
 
   async login(req: Request, res: Response): Promise<void> {
     const result = await this.loginService.execute(req.body);
-    res.status(200).json({ message: "Login successful", ...result });
+    res.status(200).json(result);
   }
 
   async getMe(req: Request, res: Response): Promise<void> {

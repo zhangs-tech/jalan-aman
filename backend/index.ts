@@ -4,21 +4,21 @@ import { reportRouter } from "./src/routes/report_route";
 import { commentRouter } from "./src/routes/comment_route";
 import { errorMiddleware } from "./src/middlewares/error_middleware";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "./swagger.json";
+import { buildOpenApiDoc } from "./src/openapi";
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.send("Hello World!");
 });
 
 app.use("/auth", authRouter);
 app.use("/reports", reportRouter);
 app.use("/reports/:reportId/comments", commentRouter);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(buildOpenApiDoc()));
 
 app.use(errorMiddleware);
 

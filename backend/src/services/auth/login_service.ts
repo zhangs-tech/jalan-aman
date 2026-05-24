@@ -1,36 +1,19 @@
 import bcrypt from "bcrypt";
 import type PrismaUserRepository from "../../repositories/prisma_user_repository";
 import JwtService from "./jwt_service";
-import { BadRequestError, UnauthorizedError } from "../../errors";
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  accessToken: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    phone: string;
-    role: string;
-  };
-}
+import { UnauthorizedError } from "../../errors";
+import { validateLogin } from "../../dtos/auth-login.dto";
+import type { AuthLoginResponse } from "../../dtos/auth-login.dto";
+import type { UserDTO } from "../../dtos/user.dto";
 
 export class LoginService {
   constructor(
     private readonly userRepository: PrismaUserRepository,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
-  async execute(data: LoginRequest): Promise<LoginResponse> {
-    const { email, password } = data;
-
-    if (!email || !password) {
-      throw new BadRequestError("Missing required fields: email and password");
-    }
+  async execute(input: unknown): Promise<AuthLoginResponse> {
+    const { email, password } = validateLogin(input);
 
     const user = await this.userRepository.findByEmail(email);
 
@@ -50,15 +33,18 @@ export class LoginService {
       role: user.role,
     });
 
+    const userDto: UserDTO = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      role: user.role,
+    };
+
     return {
+      message: "Login successful",
       accessToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-      },
+      user: userDto,
     };
   }
 }

@@ -142,3 +142,62 @@ classDiagram
 | Status | Condition |
 |--------|-----------|
 | `400` | Missing one or more geo params, invalid ranges, bounding box exceeds 500 pins (zoom in), invalid `reportType` |
+
+---
+
+### GET `/reports/user/me`
+
+Returns the authenticated user's own reports. Always ordered by `createdAt` descending (newest first).
+
+**REQUIRES AUTHENTICATED USER**
+
+Soft-deleted reports are excluded. Expired reports are included so the user can review their full history.
+
+#### Query Parameters
+
+| Param | Type | Default | Notes |
+|-------|------|---------|-------|
+| `cursor` | string | — | Opaque pagination cursor; omit for first page |
+| `limit` | int | 20 | Max 50 |
+| `reportType` | string | — | Optional filter, comma-separated (e.g. `accident,flood`) |
+
+Cursor is null on the last page.
+
+#### Response
+
+`200 OK`
+
+Same shape as `GET /reports`, but `voteSummary.userVoted` reflects the authenticated user's vote on each report.
+
+```json
+{
+    "reports": [
+        {
+            "id": "uuid",
+            "reportType": "accident",
+            "description": "description",
+            "createdAt": "2026-05-23T10:00:00Z",
+            "updatedAt": "2026-05-23T10:00:00Z",
+            "expiresAt": "2026-05-23T12:00:00Z",
+            "reportedBy": "uuid",
+            "latitude": 40.205,
+            "longitude": 21.443,
+            "address": "address",
+            "zipCode": "51030",
+            "voteSummary": {
+                "confirms": 3,
+                "resolves": 1,
+                "userVoted": "confirm"
+            }
+        }
+    ],
+    "nextCursor": "ZXh...3PQ=="
+}
+```
+
+#### Failure Responses
+
+| Status | Condition |
+|--------|-----------|
+| `400` | Invalid `limit` (exceeds 50), invalid `reportType` |
+| `401` | Missing or invalid authentication |

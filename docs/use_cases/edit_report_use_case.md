@@ -21,7 +21,9 @@ OP must be the `reportedBy` user and must be within 100 meters of the report's c
 ```json
 {
     "description": "updated description", // max 256 chars
-    "address": "updated address" // max 256 chars
+    "address": "updated address", // max 256 chars
+    "userLat": 40.205, // float number, -90 to 90, user's current latitude
+    "userLng": 21.443 // float number, -180 to 180, user's current longitude
 }
 ```
 
@@ -30,6 +32,8 @@ classDiagram
     class ReportEditDTO {
         +string description
         +string address
+        +float userLat
+        +float userLng
     }
 ```
 
@@ -74,7 +78,7 @@ classDiagram
 
 | Status | Condition |
 |--------|-----------|
-| `400` | Missing required fields or invalid values (description max 256 chars, address max 256 chars) |
+| `400` | Missing required fields or invalid values (description/address max 256 chars, userLat -90 to 90, userLng -180 to 180) |
 | `401` | Missing or invalid authentication |
 | `403` | Authenticated user is not the OP |
 | `404` | Report not found |

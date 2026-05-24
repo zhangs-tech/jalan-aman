@@ -1,0 +1,197 @@
+# Reusable schemas for the Jalan Aman API.
+
+UserDTO:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    email:
+      type: string
+      format: email
+    name:
+      type: string
+    phone:
+      type: string
+    role:
+      type: string
+      enum: [USER, MODERATOR]
+  required: [id, email, name, phone, role]
+
+ReportDTO:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    reportType:
+      type: string
+      enum: [accident, police, hazard, crime, flood, pothole, closure, construction, broken_traffic_light, other]
+    description:
+      type: string
+      maxLength: 256
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+    expiresAt:
+      type: string
+      format: date-time
+    reportedBy:
+      type: string
+      format: uuid
+    latitude:
+      type: number
+      format: float
+      minimum: -90
+      maximum: 90
+    longitude:
+      type: number
+      format: float
+      minimum: -180
+      maximum: 180
+    address:
+      type: string
+      maxLength: 256
+    zipCode:
+      type: string
+      nullable: true
+  required: [id, reportType, description, createdAt, updatedAt, expiresAt, reportedBy, latitude, longitude, address]
+
+VoteSummaryDTO:
+  type: object
+  properties:
+    confirms:
+      type: integer
+    resolves:
+      type: integer
+    userVoted:
+      type: string
+      nullable: true
+      enum: [confirm, resolve]
+  required: [confirms, resolves, userVoted]
+
+ReportWithVotesDTO:
+  allOf:
+    - $ref: "#/ReportDTO"
+    - type: object
+      properties:
+        voteSummary:
+          $ref: "#/VoteSummaryDTO"
+      required: [voteSummary]
+
+AttachmentDTO:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    s3Key:
+      type: string
+    mimeType:
+      type: string
+      example: image/jpeg
+    fileSize:
+      type: integer
+    createdAt:
+      type: string
+      format: date-time
+  required: [id, s3Key, mimeType, fileSize, createdAt]
+
+AttachmentUploadDTO:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    uploadUrl:
+      type: string
+      format: uri
+    s3Key:
+      type: string
+    mimeType:
+      type: string
+    fileSize:
+      type: integer
+    createdAt:
+      type: string
+      format: date-time
+  required: [id, uploadUrl, s3Key, mimeType, fileSize, createdAt]
+
+ReportDetailDTO:
+  allOf:
+    - $ref: "#/ReportDTO"
+    - type: object
+      properties:
+        commentCount:
+          type: integer
+        voteSummary:
+          $ref: "#/VoteSummaryDTO"
+        attachments:
+          type: array
+          items:
+            $ref: "#/AttachmentDTO"
+      required: [commentCount, voteSummary, attachments]
+
+PinDTO:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    reportType:
+      type: string
+    latitude:
+      type: number
+      format: float
+    longitude:
+      type: number
+      format: float
+  required: [id, reportType, latitude, longitude]
+
+CommentDTO:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    reportId:
+      type: string
+      format: uuid
+    userId:
+      type: string
+      format: uuid
+    userName:
+      type: string
+    details:
+      type: string
+      maxLength: 1024
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+  required: [id, reportId, userId, userName, details, createdAt, updatedAt]
+
+VoteDTO:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    reportId:
+      type: string
+      format: uuid
+    userId:
+      type: string
+      format: uuid
+    type:
+      type: string
+      enum: [confirm, resolve]
+    createdAt:
+      type: string
+      format: date-time
+  required: [id, reportId, userId, type, createdAt]

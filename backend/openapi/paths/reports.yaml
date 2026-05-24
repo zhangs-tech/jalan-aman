@@ -1,0 +1,487 @@
+# Report endpoints.
+
+collection:
+  post:
+    tags: [Reports]
+    summary: Submit a new report
+    operationId: submitReport
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              reportType:
+                type: string
+                enum: [accident, police, hazard, crime, flood, pothole, closure, construction, broken_traffic_light, other]
+                example: pothole
+              description:
+                type: string
+                maxLength: 256
+                example: Large pothole in the right lane near the intersection
+              latitude:
+                type: number
+                format: float
+                minimum: -90
+                maximum: 90
+                example: 3.1390
+              longitude:
+                type: number
+                format: float
+                minimum: -180
+                maximum: 180
+                example: 101.6869
+              address:
+                type: string
+                maxLength: 256
+                example: Jalan Ampang, Kuala Lumpur
+              zipCode:
+                type: string
+                example: "50450"
+              attachment:
+                type: object
+                properties:
+                  mimeType:
+                    type: string
+                    example: image/jpeg
+                  fileSize:
+                    type: integer
+                    example: 204800
+                required: [mimeType, fileSize]
+            required: [reportType, description, latitude, longitude, address]
+    responses:
+      "201":
+        description: Report created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                report:
+                  $ref: ../components/schemas.yaml#/ReportDTO
+                attachment:
+                  nullable: true
+                  $ref: ../components/schemas.yaml#/AttachmentUploadDTO
+              required: [report]
+      "400":
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+  get:
+    tags: [Reports]
+    summary: List reports (feed)
+    description: |-
+      Cursor-paginated feed of active reports.
+      Public — pass an optional `Authorization` header to populate `voteSummary.userVoted`.
+      Expired and soft-deleted reports are excluded.
+    operationId: listReports
+    parameters:
+      - $ref: ../components/parameters.yaml#/Cursor
+      - $ref: ../components/parameters.yaml#/Limit
+      - $ref: ../components/parameters.yaml#/ReportType
+      - $ref: ../components/parameters.yaml#/Sort
+      - $ref: ../components/parameters.yaml#/Order
+    responses:
+      "200":
+        description: Paginated list of reports
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reports:
+                  type: array
+                  items:
+                    $ref: ../components/schemas.yaml#/ReportWithVotesDTO
+                nextCursor:
+                  type: string
+                  nullable: true
+                  description: Present on all but the last page
+              required: [reports, nextCursor]
+      "400":
+        description: Invalid filter or sort parameter
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+map:
+  get:
+    tags: [Reports]
+    summary: Map pin data
+    description: |-
+      Lightweight data for rendering report markers on a map.
+      Public — no authentication required. Capped at 500 pins.
+      Expired and soft-deleted reports are excluded.
+    operationId: mapPins
+    parameters:
+      - name: swLat
+        in: query
+        required: true
+        schema:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+        example: 3.12
+      - name: swLng
+        in: query
+        required: true
+        schema:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+        example: 101.67
+      - name: neLat
+        in: query
+        required: true
+        schema:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+        example: 3.16
+      - name: neLng
+        in: query
+        required: true
+        schema:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+        example: 101.70
+      - $ref: ../components/parameters.yaml#/ReportType
+    responses:
+      "200":
+        description: Array of pins
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pins:
+                  type: array
+                  items:
+                    $ref: ../components/schemas.yaml#/PinDTO
+              required: [pins]
+      "400":
+        description: Missing geo parameters or invalid ranges
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+myReports:
+  get:
+    tags: [Reports]
+    summary: My reports
+    description: |-
+      Reports created by the authenticated user, newest first.
+      Soft-deleted reports are excluded; expired reports are included.
+    operationId: myReports
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/Cursor
+      - $ref: ../components/parameters.yaml#/Limit
+      - $ref: ../components/parameters.yaml#/ReportType
+    responses:
+      "200":
+        description: Paginated list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reports:
+                  type: array
+                  items:
+                    $ref: ../components/schemas.yaml#/ReportWithVotesDTO
+                nextCursor:
+                  type: string
+                  nullable: true
+              required: [reports, nextCursor]
+      "400":
+        description: Invalid filter
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+detail:
+  get:
+    tags: [Reports]
+    summary: Get report detail
+    description: |-
+      Full detail including attachments, vote summary, and comment count.
+      Public — pass an optional `Authorization` header to populate `userVoted`.
+    operationId: getReportDetail
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+    responses:
+      "200":
+        description: Full report detail
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                report:
+                  $ref: ../components/schemas.yaml#/ReportDetailDTO
+              required: [report]
+      "404":
+        description: Report not found or soft-deleted
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+  put:
+    tags: [Reports]
+    summary: Edit a report
+    description: |-
+      Only the original poster can edit. The user must be within 100 m of the report location
+      (Haversine proximity check using `userLat` / `userLng`).
+    operationId: editReport
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              description:
+                type: string
+                maxLength: 256
+                example: Pothole has grown larger — now takes up half the lane
+              address:
+                type: string
+                maxLength: 256
+                example: Jalan Ampang, opposite the Shell station, Kuala Lumpur
+              userLat:
+                type: number
+                format: float
+                minimum: -90
+                maximum: 90
+                example: 3.1391
+              userLng:
+                type: number
+                format: float
+                minimum: -180
+                maximum: 180
+                example: 101.6870
+            required: [description, address, userLat, userLng]
+    responses:
+      "200":
+        description: Report updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                report:
+                  $ref: ../components/schemas.yaml#/ReportDTO
+              required: [report]
+      "400":
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "403":
+        description: Not the original poster, or too far from the report location
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Report not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+  delete:
+    tags: [Reports]
+    summary: Soft-delete a report
+    description: Only the original poster can delete.
+    operationId: deleteReport
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+    responses:
+      "200":
+        description: Report deleted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Report deleted
+              required: [message]
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "403":
+        description: Not the original poster
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Report not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+downloadAttachment:
+  get:
+    tags: [Reports]
+    summary: Download attachment
+    description: Returns a pre-signed S3 URL (valid 5 min) for a single attachment.
+    operationId: downloadAttachment
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+      - $ref: ../components/parameters.yaml#/AttachmentId
+    responses:
+      "200":
+        description: Pre-signed download URL
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                downloadUrl:
+                  type: string
+                  format: uri
+              required: [downloadUrl]
+      "404":
+        description: Report not found or attachment does not belong to this report
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+confirm:
+  post:
+    tags: [Reports]
+    summary: Confirm a report
+    description: |-
+      Cast a "confirm" vote on a report. Rate-limited — one user may only cast
+      one vote (confirm or resolve) per 24 hours per report.
+    operationId: confirmReport
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+    responses:
+      "200":
+        description: Vote recorded
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vote:
+                  $ref: ../components/schemas.yaml#/VoteDTO
+                report:
+                  $ref: ../components/schemas.yaml#/ReportDTO
+              required: [vote, report]
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Report not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "422":
+        description: Rate-limited (already voted within 24 hours)
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+resolve:
+  post:
+    tags: [Reports]
+    summary: Resolve a report
+    description: |-
+      Cast a "resolve" vote on a report. Rate-limited — one user may only cast
+      one vote (confirm or resolve) per 24 hours per report.
+    operationId: resolveReport
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+    responses:
+      "200":
+        description: Vote recorded
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vote:
+                  $ref: ../components/schemas.yaml#/VoteDTO
+                report:
+                  $ref: ../components/schemas.yaml#/ReportDTO
+              required: [vote, report]
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Report not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "422":
+        description: Rate-limited (already voted within 24 hours)
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
