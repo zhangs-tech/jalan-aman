@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "genkey": "bun run scripts/genkey.ts",
     "dev": "bun run index.ts",
     "db": "bun --bun prisma"
   },
