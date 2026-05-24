@@ -131,6 +131,5 @@ classDiagram
 
 | Status | Condition |
 |--------|-----------|
-| `400` | Missing required fields, invalid values, or coordinates out of range (latitude: -90 to 90, longitude: -180 to 180) |
+| `400` | Missing required fields, invalid values, unrecognized `reportType`, or coordinates out of range (latitude: -90 to 90, longitude: -180 to 180) |
 | `401` | Missing or invalid authentication |
-| `422` | Unrecognized `reportType` |
