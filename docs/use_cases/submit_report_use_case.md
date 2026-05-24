@@ -9,8 +9,9 @@ Image is optional.
 ## Flow
 
 1. User sees a problem
-2. User submits a report
+2. User submits a report (with optional attachment metadata)
 3. Report is saved and visible to other users
+4. If an attachment was requested, the client uploads the file directly to the pre-signed S3 URL
 
 ## Endpoints
 
@@ -41,11 +42,14 @@ Valid `reportType` values:
 {
     "reportType": "accident",
     "description": "description", // max 256 chars
-    "latitude": 40.205, // float number
-    "longitude": 21.443,
+    "latitude": 40.205, // float number, -90 to 90
+    "longitude": 21.443, // float number, -180 to 180
     "address": "address", // max 256 chars
     "zipCode": "51030", // optional
-    "attachment": true
+    "attachment": { // optional
+        "mimeType": "image/jpeg",
+        "fileSize": 102400
+    }
 }
 ```
 
@@ -58,7 +62,11 @@ classDiagram
         +float longitude
         +string address
         +string? zipCode
-        +bool attachment
+        +AttachmentMetaDTO? attachment
+    }
+    class AttachmentMetaDTO {
+        +string mimeType
+        +int fileSize
     }
 ```
 
@@ -79,10 +87,12 @@ classDiagram
         "address": "address",
         "zipCode": "51030"
     },
-    "attachment": { // only if "attachment": true
+    "attachment": { // only if attachment was provided
         "id": "uuid",
         "uploadUrl": "s3 pre-signed url",
         "s3Key": "reports/uuid/image.jpg",
+        "mimeType": "image/jpeg",
+        "fileSize": 102400,
         "createdAt": "2026-05-23T10:00:00Z"
     }
 }
@@ -111,6 +121,8 @@ classDiagram
         +string id
         +string uploadUrl
         +string s3Key
+        +string mimeType
+        +int fileSize
         +datetime createdAt
     }
 ```
@@ -122,36 +134,3 @@ classDiagram
 | `400` | Missing required fields, invalid values, or coordinates out of range (latitude: -90 to 90, longitude: -180 to 180) |
 | `401` | Missing or invalid authentication |
 | `422` | Unrecognized `reportType` |
-
-### POST `/reports/:reportId/attachments/:attachmentId/confirm`
-
-**REQUIRES AUTHENTICATED USER**
-
-Confirms that the client has finished uploading the attachment to the pre-signed S3 URL. Marks the attachment as ready for serving.
-
-User must be the `reportedBy` of the parent report.
-
-#### Response
-
-`200 OK`
-
-```json
-{
-    "attachment": {
-        "id": "uuid",
-        "s3Key": "reports/uuid/image.jpg",
-        "mimeType": "image/jpeg",
-        "fileSize": 102400,
-        "createdAt": "2026-05-23T10:01:00Z"
-    }
-}
-```
-
-#### Failure Responses
-
-| Status | Condition |
-|--------|-----------|
-| `400` | Attachment not found or already confirmed |
-| `401` | Missing or invalid authentication |
-| `403` | Authenticated user is not the OP of the parent report |
-| `404` | Report or attachment not found |
