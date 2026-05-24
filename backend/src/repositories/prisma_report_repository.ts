@@ -38,13 +38,32 @@ export type ReportDTO = {
   longitude: number;
   address: string;
   zipCode: string | null;
+};
+
+export type CreateReportResult = ReportDTO & {
   attachments: AttachmentDTO[];
+};
+
+export type ReportWithVotes = ReportDTO & {
+  votes: Array<{ type: string; userId: string }>;
+};
+
+export type ReportListResult = {
+  reports: ReportWithVotes[];
+  nextCursor: string | null;
+};
+
+export type PinResult = {
+  id: string;
+  reportType: string;
+  latitude: number;
+  longitude: number;
 };
 
 export default class PrismaReportRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async create(data: CreateReportData): Promise<ReportDTO> {
+  async create(data: CreateReportData): Promise<CreateReportResult> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const createData: Record<string, any> = {
       reportType: data.reportType,
@@ -74,7 +93,7 @@ export default class PrismaReportRepository {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: createData as any,
       include: { attachments: true },
-    })) as ReportDTO;
+    })) as CreateReportResult;
   }
 
   async findById(id: string) {
@@ -98,5 +117,86 @@ export default class PrismaReportRepository {
         address: data.address,
       },
     })) as ReportDTO;
+  }
+
+  async findMany(params: {
+    cursor?: string;
+    limit: number;
+    reportType?: string[];
+    sort: "createdAt" | "expiresAt";
+    order: "asc" | "desc";
+  }): Promise<ReportListResult> {
+    const now = new Date();
+    const take = params.limit + 1;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
+      deletedAt: null,
+      expiresAt: { gt: now },
+    };
+
+    if (params.reportType && params.reportType.length > 0) {
+      where.reportType = { in: params.reportType };
+    }
+
+    if (params.cursor) {
+      const cursorValue = new Date(Buffer.from(params.cursor, "base64").toString("utf-8"));
+      where[params.sort] = {
+        [params.order === "asc" ? "gt" : "lt"]: cursorValue,
+      };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = (await this.prisma.report.findMany({
+      where: where as any,
+      orderBy: { [params.sort]: params.order },
+      take,
+      include: {
+        votes: {
+          select: { type: true, userId: true },
+        },
+      },
+    })) as ReportWithVotes[];
+
+    const hasMore = rows.length > params.limit;
+    const reports = hasMore ? rows.slice(0, params.limit) : rows;
+    const nextCursor = hasMore
+      ? Buffer.from(reports[reports.length - 1]![params.sort].toISOString()).toString("base64")
+      : null;
+
+    return { reports, nextCursor };
+  }
+
+  async findPins(params: {
+    swLat: number;
+    swLng: number;
+    neLat: number;
+    neLng: number;
+    reportType?: string[];
+  }): Promise<PinResult[]> {
+    const now = new Date();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
+      deletedAt: null,
+      expiresAt: { gt: now },
+      latitude: { gte: params.swLat, lte: params.neLat },
+      longitude: { gte: params.swLng, lte: params.neLng },
+    };
+
+    if (params.reportType && params.reportType.length > 0) {
+      where.reportType = { in: params.reportType };
+    }
+
+    return (await this.prisma.report.findMany({
+      where: where as any,
+      select: {
+        id: true,
+        reportType: true,
+        latitude: true,
+        longitude: true,
+      },
+      take: 500,
+    })) as PinResult[];
   }
 }

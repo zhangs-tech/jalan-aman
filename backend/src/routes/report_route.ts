@@ -7,6 +7,8 @@ import { CreateReportService } from "../services/report/create_report_service";
 import { EditReportService } from "../services/report/edit_report_service";
 import { DeleteReportService } from "../services/report/delete_report_service";
 import { VoteReportService } from "../services/report/vote_report_service";
+import { ListReportsService } from "../services/report/list_reports_service";
+import { MapPinsService } from "../services/report/map_pins_service";
 import { S3Service } from "../services/s3/s3_service";
 import { authMiddleware } from "../middlewares/auth_middleware";
 
@@ -17,16 +19,28 @@ const createReportService = new CreateReportService(reportRepository, s3Service)
 const editReportService = new EditReportService(reportRepository);
 const deleteReportService = new DeleteReportService(reportRepository);
 const voteReportService = new VoteReportService(reportRepository, voteRepository);
+const listReportsService = new ListReportsService(reportRepository);
+const mapPinsService = new MapPinsService(reportRepository);
 
-const reportController = new ReportController(createReportService, editReportService, deleteReportService, voteReportService);
+const reportController = new ReportController(
+  createReportService,
+  editReportService,
+  deleteReportService,
+  voteReportService,
+  listReportsService,
+  mapPinsService
+);
 
 export const reportRouter = Router();
 
 reportRouter.post("/", authMiddleware, (req, res) =>
   reportController.create(req, res)
 );
-reportRouter.get("/", authMiddleware, (req, res) =>
+reportRouter.get("/", (req, res) =>
   reportController.getAll(req, res)
+);
+reportRouter.get("/map", (req, res) =>
+  reportController.getMap(req, res)
 );
 reportRouter.get("/user/me", authMiddleware, (req, res) =>
   reportController.getByUser(req, res)
