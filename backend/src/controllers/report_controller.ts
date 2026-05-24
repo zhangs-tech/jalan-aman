@@ -2,13 +2,15 @@ import type { Request, Response } from "express";
 import type { CreateReportService } from "../services/report/create_report_service";
 import type { EditReportService } from "../services/report/edit_report_service";
 import type { DeleteReportService } from "../services/report/delete_report_service";
+import type { VoteReportService } from "../services/report/vote_report_service";
 import { UnauthorizedError } from "../errors";
 
 export class ReportController {
   constructor(
     private readonly createReportService: CreateReportService,
     private readonly editReportService: EditReportService,
-    private readonly deleteReportService: DeleteReportService
+    private readonly deleteReportService: DeleteReportService,
+    private readonly voteReportService: VoteReportService
   ) {}
 
   async create(req: Request, res: Response): Promise<void> {
@@ -64,6 +66,28 @@ export class ReportController {
 
     const { id } = req.params;
     const result = await this.editReportService.execute(req.body, id as string, req.user.id);
+
+    res.status(200).json(result);
+  }
+
+  async confirm(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { reportId } = req.params;
+    const result = await this.voteReportService.execute(reportId as string, req.user.id, "confirm");
+
+    res.status(200).json(result);
+  }
+
+  async resolve(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { reportId } = req.params;
+    const result = await this.voteReportService.execute(reportId as string, req.user.id, "resolve");
 
     res.status(200).json(result);
   }
