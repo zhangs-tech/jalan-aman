@@ -1,80 +1,79 @@
-import type { PrismaClient, Prisma, ReportStatus } from "../generated/prisma/client";
-import { NotFoundError } from "../errors";
+import type { PrismaClient } from "../generated/prisma/client";
+
+export type CreateReportData = {
+  reportType: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  address: string;
+  zipCode?: string;
+  expiresAt: Date;
+  reportedBy: string;
+  attachment?: {
+    s3Key: string;
+    mimeType: string;
+    fileSize: number;
+  };
+};
+
+export type AttachmentDTO = {
+  id: string;
+  reportId: string;
+  s3Key: string;
+  mimeType: string;
+  fileSize: number;
+  createdAt: Date;
+};
+
+export type ReportDTO = {
+  id: string;
+  reportType: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+  expiresAt: Date;
+  deletedAt: Date | null;
+  reportedBy: string;
+  latitude: number;
+  longitude: number;
+  address: string;
+  zipCode: string | null;
+  attachments: AttachmentDTO[];
+};
 
 export default class PrismaReportRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async create(data: Prisma.ReportCreateInput) {
-    return await this.prisma.report.create({ data });
-  }
+  async create(data: CreateReportData): Promise<ReportDTO> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const createData: Record<string, any> = {
+      reportType: data.reportType,
+      description: data.description,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      address: data.address,
+      expiresAt: data.expiresAt,
+      reportedBy: data.reportedBy,
+    };
 
-  async findAll() {
-    return await this.prisma.report.findMany({
-      orderBy: { reportedAt: 'desc' },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true }
-        }
-      }
-    });
-  }
+    if (data.zipCode !== undefined) {
+      createData.zipCode = data.zipCode;
+    }
 
-  async findByUserId(userId: string) {
-    return await this.prisma.report.findMany({
-      where: { reportedBy: userId },
-      orderBy: { reportedAt: 'desc' },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true }
-        }
-      }
-    });
-  }
-
-  async findById(reportID: string) {
-    return await this.prisma.report.findUnique({
-      where: { reportID },
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        history: {
-          include: {
-            user: { select: { id: true, name: true } }
-          }
+    if (data.attachment) {
+      createData.attachments = {
+        create: {
+          s3Key: data.attachment.s3Key,
+          mimeType: data.attachment.mimeType,
+          fileSize: data.attachment.fileSize,
         },
-        comments: {
-          orderBy: { createdAt: 'desc' },
-          include: {
-            user: { select: { id: true, name: true } }
-          }
-        }
-      }
-    });
-  }
+      };
+    }
 
-  async updateStatus(reportID: string, newStatus: ReportStatus, changedBy: string, details: string, imgB64?: string) {
-    return await this.prisma.$transaction(async (tx) => {
-      const report = await tx.report.findUnique({ where: { reportID } });
-      if (!report) throw new NotFoundError("Report not found");
-
-      const oldStatus = report.status;
-
-      const updatedReport = await tx.report.update({
-        where: { reportID },
-        data: { status: newStatus }
-      });
-
-      await tx.reportHistory.create({
-        data: {
-          reportID,
-          changedBy,
-          oldStatus,
-          newStatus,
-          details,
-          imgB64: imgB64 || report.imgB64
-        }
-      });
-
-      return updatedReport;
-    });
+    return (await this.prisma.report.create({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: createData as any,
+      include: { attachments: true },
+    })) as ReportDTO;
   }
 }
