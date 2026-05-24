@@ -1,6 +1,7 @@
 // DTOs for auth use cases
 // See: docs/use_cases/login_use_case.md, register_use_case.md, logout_use_case.md
 
+import { z } from "zod";
 import { BadRequestError } from "../errors";
 
 // ---------------------------------------------------------------------------
@@ -19,10 +20,12 @@ export type UserDTO = {
 // Login
 // ---------------------------------------------------------------------------
 
-export type AuthLoginDTO = {
-  email: string;
-  password: string;
-};
+const loginSchema = z.object({
+  email: z.string().min(1, "email must be a non-empty string"),
+  password: z.string().min(1, "password must be a non-empty string"),
+});
+
+export type AuthLoginDTO = z.infer<typeof loginSchema>;
 
 export type AuthLoginResponse = {
   message: string;
@@ -31,89 +34,42 @@ export type AuthLoginResponse = {
 };
 
 export function validateLogin(input: unknown): AuthLoginDTO {
-  if (typeof input !== "object" || input === null) {
-    throw new BadRequestError("Request body must be a JSON object");
+  const result = loginSchema.safeParse(input);
+  if (!result.success) {
+    const message = result.error.issues.map((i) => i.message).join("; ");
+    throw new BadRequestError(message);
   }
-
-  const body = input as Record<string, unknown>;
-  const { email, password } = body;
-
-  if (email == null || password == null) {
-    throw new BadRequestError("Missing required fields: email, password");
-  }
-
-  if (typeof email !== "string" || email.length === 0) {
-    throw new BadRequestError("email must be a non-empty string");
-  }
-
-  if (typeof password !== "string" || password.length === 0) {
-    throw new BadRequestError("password must be a non-empty string");
-  }
-
-  return { email, password };
+  return result.data;
 }
 
 // ---------------------------------------------------------------------------
 // Register
 // ---------------------------------------------------------------------------
 
-export type AuthRegisterDTO = {
-  email: string;
-  password: string;
-  name: string;
-  phone: string;
-};
+const registerSchema = z.object({
+  email: z.string().email("email must be a valid email address"),
+  password: z
+    .string()
+    .min(8, "password must be at least 8 characters")
+    .regex(/[A-Z]/, "password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "password must contain at least one digit"),
+  name: z.string().min(1, "name must be a non-empty string"),
+  phone: z.string().min(1, "phone must be a non-empty string"),
+});
+
+export type AuthRegisterDTO = z.infer<typeof registerSchema>;
 
 export type AuthRegisterResponse = {
   message: string;
   user: UserDTO;
 };
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export function validateRegister(input: unknown): AuthRegisterDTO {
-  if (typeof input !== "object" || input === null) {
-    throw new BadRequestError("Request body must be a JSON object");
+  const result = registerSchema.safeParse(input);
+  if (!result.success) {
+    const message = result.error.issues.map((i) => i.message).join("; ");
+    throw new BadRequestError(message);
   }
-
-  const body = input as Record<string, unknown>;
-  const { email, password, name, phone } = body;
-
-  if (email == null || password == null || name == null || phone == null) {
-    throw new BadRequestError("Missing required fields: email, password, name, phone");
-  }
-
-  if (typeof email !== "string" || !EMAIL_RE.test(email)) {
-    throw new BadRequestError("email must be a valid email address");
-  }
-
-  if (typeof password !== "string") {
-    throw new BadRequestError("password must be a string");
-  }
-
-  if (password.length < 8) {
-    throw new BadRequestError("password must be at least 8 characters");
-  }
-
-  if (!/[A-Z]/.test(password)) {
-    throw new BadRequestError("password must contain at least one uppercase letter");
-  }
-
-  if (!/[a-z]/.test(password)) {
-    throw new BadRequestError("password must contain at least one lowercase letter");
-  }
-
-  if (!/[0-9]/.test(password)) {
-    throw new BadRequestError("password must contain at least one digit");
-  }
-
-  if (typeof name !== "string" || name.trim().length === 0) {
-    throw new BadRequestError("name must be a non-empty string");
-  }
-
-  if (typeof phone !== "string" || phone.trim().length === 0) {
-    throw new BadRequestError("phone must be a non-empty string");
-  }
-
-  return { email, password, name: name.trim(), phone: phone.trim() };
+  return result.data;
 }
