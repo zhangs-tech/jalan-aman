@@ -1,0 +1,205 @@
+# Comment endpoints (mounted under /reports/{reportId}/comments).
+
+collection:
+  post:
+    tags: [Comments]
+    summary: Add a comment
+    operationId: addComment
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              details:
+                type: string
+                minLength: 1
+                maxLength: 1024
+                example: I passed by here this morning — it's still there and getting worse.
+            required: [details]
+    responses:
+      "201":
+        description: Comment created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  $ref: ../components/schemas.yaml#/CommentDTO
+                report:
+                  $ref: ../components/schemas.yaml#/ReportDTO
+              required: [comment, report]
+      "400":
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Report not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+  get:
+    tags: [Comments]
+    summary: List comments on a report
+    description: Cursor-paginated. Public — no authentication required.
+    operationId: listComments
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+      - $ref: ../components/parameters.yaml#/Cursor
+      - name: limit
+        in: query
+        required: false
+        description: Page size (max 100)
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+    responses:
+      "200":
+        description: Paginated comments
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comments:
+                  type: array
+                  items:
+                    $ref: ../components/schemas.yaml#/CommentDTO
+                nextCursor:
+                  type: string
+                  nullable: true
+              required: [comments, nextCursor]
+      "400":
+        description: Invalid limit
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Report not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+item:
+  patch:
+    tags: [Comments]
+    summary: Update a comment
+    description: Only the comment author can update.
+    operationId: updateComment
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+      - $ref: ../components/parameters.yaml#/CommentId
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              details:
+                type: string
+                minLength: 1
+                maxLength: 1024
+                example: Correction — the pothole has since been patched.
+            required: [details]
+    responses:
+      "200":
+        description: Comment updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Comment updated successfully
+                comment:
+                  $ref: ../components/schemas.yaml#/CommentDTO
+              required: [message, comment]
+      "400":
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "403":
+        description: Not the comment author
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Comment not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+
+  delete:
+    tags: [Comments]
+    summary: Delete a comment
+    description: Only the comment author can delete.
+    operationId: deleteComment
+    security:
+      - BearerAuth: []
+    parameters:
+      - $ref: ../components/parameters.yaml#/ReportId
+      - $ref: ../components/parameters.yaml#/CommentId
+    responses:
+      "200":
+        description: Comment deleted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Comment deleted successfully
+              required: [message]
+      "401":
+        description: Missing or invalid token
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "403":
+        description: Not the comment author
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
+      "404":
+        description: Comment not found
+        content:
+          application/json:
+            schema:
+              $ref: ../openapi.yaml#/components/schemas/Error
