@@ -1,11 +1,13 @@
 import type { Request, Response } from "express";
 import type { CreateReportService } from "../services/report/create_report_service";
+import type { EditReportService } from "../services/report/edit_report_service";
 import type { DeleteReportService } from "../services/report/delete_report_service";
 import { UnauthorizedError } from "../errors";
 
 export class ReportController {
   constructor(
     private readonly createReportService: CreateReportService,
+    private readonly editReportService: EditReportService,
     private readonly deleteReportService: DeleteReportService
   ) {}
 
@@ -53,5 +55,16 @@ export class ReportController {
     await this.deleteReportService.execute(id as string, req.user.id);
 
     res.status(200).json({ message: "Report deleted" });
+  }
+
+  async edit(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { id } = req.params;
+    const result = await this.editReportService.execute(req.body, id as string, req.user.id);
+
+    res.status(200).json(result);
   }
 }

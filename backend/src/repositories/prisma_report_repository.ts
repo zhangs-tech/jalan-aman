@@ -89,4 +89,14 @@ export default class PrismaReportRepository {
       data: { deletedAt: new Date() },
     });
   }
+
+  async update(id: string, data: { description: string; address: string }): Promise<ReportDTO> {
+    return (await this.prisma.report.update({
+      where: { id },
+      data: {
+        description: data.description,
+        address: data.address,
+      },
+    })) as ReportDTO;
+  }
 }

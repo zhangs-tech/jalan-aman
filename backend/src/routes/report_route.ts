@@ -3,6 +3,7 @@ import { ReportController } from "../controllers/report_controller";
 import prisma from "../prisma";
 import PrismaReportRepository from "../repositories/prisma_report_repository";
 import { CreateReportService } from "../services/report/create_report_service";
+import { EditReportService } from "../services/report/edit_report_service";
 import { DeleteReportService } from "../services/report/delete_report_service";
 import { S3Service } from "../services/s3/s3_service";
 import { authMiddleware } from "../middlewares/auth_middleware";
@@ -10,9 +11,10 @@ import { authMiddleware } from "../middlewares/auth_middleware";
 const reportRepository = new PrismaReportRepository(prisma);
 const s3Service = new S3Service();
 const createReportService = new CreateReportService(reportRepository, s3Service);
+const editReportService = new EditReportService(reportRepository);
 const deleteReportService = new DeleteReportService(reportRepository);
 
-const reportController = new ReportController(createReportService, deleteReportService);
+const reportController = new ReportController(createReportService, editReportService, deleteReportService);
 
 export const reportRouter = Router();
 
@@ -27,6 +29,9 @@ reportRouter.get("/user/me", authMiddleware, (req, res) =>
 );
 reportRouter.get("/:id", authMiddleware, (req, res) =>
   reportController.getById(req, res)
+);
+reportRouter.put("/:id", authMiddleware, (req, res) =>
+  reportController.edit(req, res)
 );
 reportRouter.delete("/:id", authMiddleware, (req, res) =>
   reportController.delete(req, res)
