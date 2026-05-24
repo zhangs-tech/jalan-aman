@@ -1,91 +1,136 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 import type { CreateReportService } from "../services/report/create_report_service";
-import type { GetAllReportsService } from "../services/report/get_all_reports_service";
-import type { GetReportByIdService } from "../services/report/get_report_by_id_service";
-import type { UpdateReportStatusService } from "../services/report/update_report_status_service";
+import type { EditReportService } from "../services/report/edit_report_service";
+import type { DeleteReportService } from "../services/report/delete_report_service";
+import type { VoteReportService } from "../services/report/vote_report_service";
+import type { ListReportsService } from "../services/report/list_reports_service";
+import type { MapPinsService } from "../services/report/map_pins_service";
+import type { GetReportDetailService } from "../services/report/get_report_detail_service";
+import type { GetAttachmentDownloadService } from "../services/report/get_attachment_download_service";
 import type { GetReportsByUserService } from "../services/report/get_reports_by_user_service";
+import JwtService from "../services/auth/jwt_service";
+import { UnauthorizedError } from "../errors";
+
+const jwtService = new JwtService();
 
 export class ReportController {
   constructor(
     private readonly createReportService: CreateReportService,
-    private readonly getAllReportsService: GetAllReportsService,
-    private readonly getReportByIdService: GetReportByIdService,
-    private readonly updateReportStatusService: UpdateReportStatusService,
+    private readonly editReportService: EditReportService,
+    private readonly deleteReportService: DeleteReportService,
+    private readonly voteReportService: VoteReportService,
+    private readonly listReportsService: ListReportsService,
+    private readonly mapPinsService: MapPinsService,
+    private readonly getReportDetailService: GetReportDetailService,
+    private readonly getAttachmentDownloadService: GetAttachmentDownloadService,
     private readonly getReportsByUserService: GetReportsByUserService
-  ) { }
+  ) {}
 
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-      }
-
-      const data = {
-        ...req.body,
-        reportedBy: req.user.id
-      };
-
-      const result = await this.createReportService.execute(data);
-      res.status(201).json({ message: "Report created successfully", report: result });
-    } catch (error) {
-      next(error as Error);
+  async create(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
     }
+
+    const result = await this.createReportService.execute(req.body, req.user.id);
+
+    res.status(201).json(result);
   }
 
-  async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const reports = await this.getAllReportsService.execute();
-      res.status(200).json({ reports });
-    } catch (error) {
-      next(error as Error);
-    }
+  async getAll(req: Request, res: Response): Promise<void> {
+    const userId = await this.tryGetUserId(req);
+    const result = await this.listReportsService.execute(req.query, userId);
+
+    res.status(200).json(result);
   }
 
-  async getByUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-      }
-      const reports = await this.getReportsByUserService.execute(req.user.id);
-      res.status(200).json({ reports });
-    } catch (error) {
-      next(error as Error);
+  async getByUser(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
     }
+
+    const result = await this.getReportsByUserService.execute(req.query, req.user.id);
+
+    res.status(200).json(result);
   }
 
-  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { id } = req.params;
-      const report = await this.getReportByIdService.execute(id as string);
-      res.status(200).json({ report });
-    } catch (error) {
-      next(error as Error);
-    }
+  async getById(req: Request, res: Response): Promise<void> {
+    const userId = await this.tryGetUserId(req);
+    const { id } = req.params;
+    const result = await this.getReportDetailService.execute(id as string, userId);
+
+    res.status(200).json(result);
   }
 
-  async updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async downloadAttachment(req: Request, res: Response): Promise<void> {
+    const { reportId, attachmentId } = req.params;
+    const result = await this.getAttachmentDownloadService.execute(
+      reportId as string,
+      attachmentId as string
+    );
+
+    res.status(200).json(result);
+  }
+
+  async getMap(req: Request, res: Response): Promise<void> {
+    const result = await this.mapPinsService.execute(req.query);
+
+    res.status(200).json(result);
+  }
+
+  async delete(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { id } = req.params;
+    await this.deleteReportService.execute(id as string, req.user.id);
+
+    res.status(200).json({ message: "Report deleted" });
+  }
+
+  async edit(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { id } = req.params;
+    const result = await this.editReportService.execute(req.body, id as string, req.user.id);
+
+    res.status(200).json(result);
+  }
+
+  async confirm(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { reportId } = req.params;
+    const result = await this.voteReportService.execute(reportId as string, req.user.id, "confirm");
+
+    res.status(200).json(result);
+  }
+
+  async resolve(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const { reportId } = req.params;
+    const result = await this.voteReportService.execute(reportId as string, req.user.id, "resolve");
+
+    res.status(200).json(result);
+  }
+
+  private async tryGetUserId(req: Request): Promise<string | undefined> {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) return undefined;
+
     try {
-      if (!req.user) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-      }
-
-      const { id } = req.params;
-      const { status, details, imgB64 } = req.body;
-
-      const result = await this.updateReportStatusService.execute(
-        id as string,
-        status,
-        req.user.id,
-        details,
-        imgB64
-      );
-
-      res.status(200).json({ message: "Report status updated", report: result });
-    } catch (error) {
-      next(error as Error);
+      const token = authHeader.split(" ")[1]!;
+      const decoded = await jwtService.verify(token);
+      return decoded.id;
+    } catch {
+      return undefined;
     }
   }
 }

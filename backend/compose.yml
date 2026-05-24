@@ -1,0 +1,28 @@
+name: jalan-aman
+services:
+  db:
+    image: postgres:18-alpine
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jalanaman
+    ports:
+      - 5433:5432
+
+  seaweedfs:
+    image: chrislusf/seaweedfs
+    ports:
+      - "8333:8333"
+    environment:
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: secret
+      S3_BUCKET: my-bucket

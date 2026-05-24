@@ -1,0 +1,58 @@
+erDiagram
+  User {
+    string id "uuid"
+    string name
+    string email "unique"
+    string phone
+    string hashedPassword
+    string role "'user' | 'admin'"
+  }
+
+  Report {
+    string id "uuid"
+    string reportType ""
+    string description
+    datetime createdAt
+    datetime updatedAt
+    datetime expiresAt
+    datetime deletedAt "optional, soft-delete"
+    string reportedBy "uuid"
+    float latitude
+    float longitude
+    string address
+    string zipCode "optional"
+  }
+
+  ReportVote {
+    string id PK "uuid"
+    string reportId FK "uuid"
+    string userId FK "uuid"
+    string type "'confirm' | 'resolve'"
+    datetime createdAt
+  }
+
+  Comment {
+    string id PK "uuid"
+    string reportId FK "uuid"
+    string userId FK "uuid"
+    string details
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  Attachment {
+    string id PK "uuid"
+    string reportId FK "uuid"
+    string s3Key
+    string mimeType
+    int fileSize "bytes"
+    datetime createdAt
+  }
+
+  User ||--o{ Report : "Reports"
+  User ||--o{ ReportVote : "Votes"
+  Report ||--o{ ReportVote : "Is Voted"
+  Report ||--o{ Comment : "Contains"
+  User ||--o{ Comment : "Comments"
+  Report ||--o{ Attachment : "Has"
+

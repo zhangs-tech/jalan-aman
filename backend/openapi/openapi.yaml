@@ -1,0 +1,120 @@
+# OpenAPI 3.0 — Jalan Aman API
+# Split across files for human readability.
+# Use tools like `swagger-cli` or `redocly` to bundle into a single file if needed.
+
+openapi: "3.0.3"
+info:
+  title: Jalan Aman API
+  version: 1.0.0
+  description: |-
+    Community-driven road hazard reporting platform.
+
+    ## Authentication
+    Most endpoints require a JWT bearer token obtained via `POST /auth/login`.
+    Include it as `Authorization: Bearer <token>`.
+
+    ## Happy Path
+    1. Create an account with `POST /auth/register`
+    2. Sign in with `POST /auth/login` → obtain a token
+    3. Submit a report with `POST /reports` (attach the token)
+    4. List reports with `GET /reports`
+    5. Confirm / resolve a report with `POST /reports/{reportId}/confirm` or `.../resolve`
+    6. Add a comment with `POST /reports/{reportId}/comments`
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+
+tags:
+  - name: Auth
+    description: Registration, login, profile, logout
+  - name: Reports
+    description: CRUD + voting on reports
+  - name: Comments
+    description: Comment threads on reports
+
+paths:
+  # --- Auth ---
+  /auth/register:
+    $ref: paths/auth.yaml#/register
+  /auth/login:
+    $ref: paths/auth.yaml#/login
+  /auth/logout:
+    $ref: paths/auth.yaml#/logout
+  /auth/me:
+    $ref: paths/auth.yaml#/me
+
+  # --- Reports ---
+  /reports:
+    $ref: paths/reports.yaml#/collection
+  /reports/map:
+    $ref: paths/reports.yaml#/map
+  /reports/user/me:
+    $ref: paths/reports.yaml#/myReports
+  /reports/{reportId}:
+    $ref: paths/reports.yaml#/detail
+  /reports/{reportId}/attachments/{attachmentId}/download:
+    $ref: paths/reports.yaml#/downloadAttachment
+  /reports/{reportId}/confirm:
+    $ref: paths/reports.yaml#/confirm
+  /reports/{reportId}/resolve:
+    $ref: paths/reports.yaml#/resolve
+  /reports/{reportId}/comments:
+    $ref: paths/comments.yaml#/collection
+  /reports/{reportId}/comments/{commentId}:
+    $ref: paths/comments.yaml#/item
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable error message
+      required: [message]
+
+    UserDTO:
+      $ref: components/schemas.yaml#/UserDTO
+    ReportDTO:
+      $ref: components/schemas.yaml#/ReportDTO
+    ReportWithVotesDTO:
+      $ref: components/schemas.yaml#/ReportWithVotesDTO
+    ReportDetailDTO:
+      $ref: components/schemas.yaml#/ReportDetailDTO
+    VoteSummaryDTO:
+      $ref: components/schemas.yaml#/VoteSummaryDTO
+    PinDTO:
+      $ref: components/schemas.yaml#/PinDTO
+    AttachmentDTO:
+      $ref: components/schemas.yaml#/AttachmentDTO
+    AttachmentUploadDTO:
+      $ref: components/schemas.yaml#/AttachmentUploadDTO
+    CommentDTO:
+      $ref: components/schemas.yaml#/CommentDTO
+    VoteDTO:
+      $ref: components/schemas.yaml#/VoteDTO
+
+  parameters:
+    ReportId:
+      $ref: components/parameters.yaml#/ReportId
+    CommentId:
+      $ref: components/parameters.yaml#/CommentId
+    AttachmentId:
+      $ref: components/parameters.yaml#/AttachmentId
+    Cursor:
+      $ref: components/parameters.yaml#/Cursor
+    Limit:
+      $ref: components/parameters.yaml#/Limit
+    ReportType:
+      $ref: components/parameters.yaml#/ReportType
+    Sort:
+      $ref: components/parameters.yaml#/Sort
+    Order:
+      $ref: components/parameters.yaml#/Order

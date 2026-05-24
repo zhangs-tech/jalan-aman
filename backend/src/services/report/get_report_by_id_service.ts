@@ -1,13 +1,5 @@
-import PrismaReportRepository from "../../repositories/prisma_report_repository";
-
+// TODO: implement in future use case
 export class GetReportByIdService {
-  constructor(private readonly reportRepository: PrismaReportRepository) { }
-
-  async execute(id: string) {
-    const report = await this.reportRepository.findById(id);
-    if (!report) {
-      throw new Error("Report not found");
-    }
-    return report;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(_repo: unknown) {}
 }

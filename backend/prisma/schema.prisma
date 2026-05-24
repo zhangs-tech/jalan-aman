@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -13,57 +11,68 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(uuid())
+  id             String       @id @default(uuid())
   name           String
-  email          String          @unique
+  email          String       @unique
   phone          String
   hashedPassword String
   role           String
 
-  reports        Report[]
-  comments       Comment[]
-  reportHistory  ReportHistory[]
+  reports       Report[]
+  reportVotes   ReportVote[]
+  comments      Comment[]
 }
 
 model Report {
-  reportID    String   @id @default(uuid())
-  status      String
+  id          String    @id @default(uuid())
+  reportType  String
   description String
-  reportedAt  DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  imgB64      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  expiresAt   DateTime
+  deletedAt   DateTime?
   reportedBy  String
   latitude    Float
   longitude   Float
   address     String
-  zipCode     String
+  zipCode     String?
 
-  user        User            @relation(fields: [reportedBy], references: [id])
+  user        User          @relation(fields: [reportedBy], references: [id])
+  votes       ReportVote[]
   comments    Comment[]
-  history     ReportHistory[]
+  attachments Attachment[]
+}
+
+model ReportVote {
+  id        String   @id @default(uuid())
+  reportId  String
+  userId    String
+  type      String
+  createdAt DateTime @default(now())
+
+  report    Report   @relation(fields: [reportId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Comment {
-  commentID String   @id @default(uuid())
-  reportID  String
-  userID    String
+  id        String   @id @default(uuid())
+  reportId  String
+  userId    String
   details   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  report    Report   @relation(fields: [reportID], references: [reportID])
-  user      User     @relation(fields: [userID], references: [id])
+  report    Report   @relation(fields: [reportId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
-model ReportHistory {
-  historyID   String @id @default(uuid())
-  reportID    String
-  changedBy   String
-  oldStatus   String
-  newStatus   String
-  imgB64      String
-  details     String
+model Attachment {
+  id        String   @id @default(uuid())
+  reportId  String
+  s3Key     String
+  mimeType  String
+  fileSize  Int
+  createdAt DateTime @default(now())
 
-  report      Report @relation(fields: [reportID], references: [reportID])
-  user        User   @relation(fields: [changedBy], references: [id])
+  report    Report   @relation(fields: [reportId], references: [id])
 }

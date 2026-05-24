@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import JwtService from "../services/auth/jwt_service";
+import { UnauthorizedError } from "../errors";
 import "../types/express";
 
 const jwtService = new JwtService();
@@ -12,15 +13,13 @@ export const authMiddleware = async (
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
+    return next(new UnauthorizedError("Unauthorized"));
   }
 
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
+    return next(new UnauthorizedError("Unauthorized"));
   }
 
   try {
@@ -32,7 +31,6 @@ export const authMiddleware = async (
     };
     next();
   } catch (_error) {
-    res.status(401).json({ message: "Invalid token" });
-    return;
+    return next(new UnauthorizedError("Invalid token"));
   }
 };
