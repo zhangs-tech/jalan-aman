@@ -8,6 +8,7 @@ import type { ReportDTO } from "./report-submit.dto";
 // ---------------------------------------------------------------------------
 
 export type ReportVoteDTO = {
+  id: string;
   reportId: string;
   userId: string;
   type: string;

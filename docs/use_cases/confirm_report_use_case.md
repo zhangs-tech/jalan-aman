@@ -29,6 +29,7 @@ _None_
 ```json
 {
     "vote": {
+        "id": "uuid",
         "reportId": "uuid",
         "userId": "uuid",
         "type": "confirm",
@@ -57,6 +58,7 @@ classDiagram
         +ReportDTO report
     }
     class ReportVoteDTO {
+        +string id
         +string reportId
         +string userId
         +string type

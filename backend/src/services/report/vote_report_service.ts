@@ -48,6 +48,7 @@ export class VoteReportService {
     );
 
     const voteDto: ReportVoteDTO = {
+      id: vote.id,
       reportId: vote.reportId,
       userId: vote.userId,
       type: vote.type,
