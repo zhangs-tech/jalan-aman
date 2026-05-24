@@ -12,6 +12,7 @@ import { ListReportsService } from "../services/report/list_reports_service";
 import { MapPinsService } from "../services/report/map_pins_service";
 import { GetReportDetailService } from "../services/report/get_report_detail_service";
 import { GetAttachmentDownloadService } from "../services/report/get_attachment_download_service";
+import { GetReportsByUserService } from "../services/report/get_reports_by_user_service";
 import { S3Service } from "../services/s3/s3_service";
 import { authMiddleware } from "../middlewares/auth_middleware";
 
@@ -27,6 +28,7 @@ const listReportsService = new ListReportsService(reportRepository);
 const mapPinsService = new MapPinsService(reportRepository);
 const getReportDetailService = new GetReportDetailService(reportRepository);
 const getAttachmentDownloadService = new GetAttachmentDownloadService(attachmentRepository, s3Service);
+const getReportsByUserService = new GetReportsByUserService(reportRepository);
 
 const reportController = new ReportController(
   createReportService,
@@ -36,7 +38,8 @@ const reportController = new ReportController(
   listReportsService,
   mapPinsService,
   getReportDetailService,
-  getAttachmentDownloadService
+  getAttachmentDownloadService,
+  getReportsByUserService
 );
 
 export const reportRouter = Router();

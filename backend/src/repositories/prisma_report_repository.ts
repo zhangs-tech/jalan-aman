@@ -188,6 +188,50 @@ export default class PrismaReportRepository {
     return { reports, nextCursor };
   }
 
+  async findByUserId(params: {
+    userId: string;
+    cursor?: string;
+    limit: number;
+    reportType?: string[];
+  }): Promise<ReportListResult> {
+    const take = params.limit + 1;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
+      deletedAt: null,
+      reportedBy: params.userId,
+    };
+
+    if (params.reportType && params.reportType.length > 0) {
+      where.reportType = { in: params.reportType };
+    }
+
+    if (params.cursor) {
+      const cursorDate = new Date(Buffer.from(params.cursor, "base64").toString("utf-8"));
+      where.createdAt = { lt: cursorDate };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = (await this.prisma.report.findMany({
+      where: where as any,
+      orderBy: { createdAt: "desc" },
+      take,
+      include: {
+        votes: {
+          select: { type: true, userId: true },
+        },
+      },
+    })) as ReportWithVotes[];
+
+    const hasMore = rows.length > params.limit;
+    const reports = hasMore ? rows.slice(0, params.limit) : rows;
+    const nextCursor = hasMore
+      ? Buffer.from(reports[reports.length - 1]!.createdAt.toISOString()).toString("base64")
+      : null;
+
+    return { reports, nextCursor };
+  }
+
   async findPins(params: {
     swLat: number;
     swLng: number;

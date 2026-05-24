@@ -7,6 +7,7 @@ import type { ListReportsService } from "../services/report/list_reports_service
 import type { MapPinsService } from "../services/report/map_pins_service";
 import type { GetReportDetailService } from "../services/report/get_report_detail_service";
 import type { GetAttachmentDownloadService } from "../services/report/get_attachment_download_service";
+import type { GetReportsByUserService } from "../services/report/get_reports_by_user_service";
 import JwtService from "../services/auth/jwt_service";
 import { UnauthorizedError } from "../errors";
 
@@ -21,7 +22,8 @@ export class ReportController {
     private readonly listReportsService: ListReportsService,
     private readonly mapPinsService: MapPinsService,
     private readonly getReportDetailService: GetReportDetailService,
-    private readonly getAttachmentDownloadService: GetAttachmentDownloadService
+    private readonly getAttachmentDownloadService: GetAttachmentDownloadService,
+    private readonly getReportsByUserService: GetReportsByUserService
   ) {}
 
   async create(req: Request, res: Response): Promise<void> {
@@ -41,9 +43,14 @@ export class ReportController {
     res.status(200).json(result);
   }
 
-  async getByUser(_req: Request, res: Response): Promise<void> {
-    // TODO: implement in future use case
-    res.status(501).json({ message: "Not implemented" });
+  async getByUser(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new UnauthorizedError("Unauthorized");
+    }
+
+    const result = await this.getReportsByUserService.execute(req.query, req.user.id);
+
+    res.status(200).json(result);
   }
 
   async getById(req: Request, res: Response): Promise<void> {
