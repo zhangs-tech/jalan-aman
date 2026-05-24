@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import type { RegisterService } from "../services/auth/register_service";
 import type { LoginService } from "../services/auth/login_service";
+import { ValidationError } from "../services/auth/validation_error";
 
 export class AuthController {
   constructor(
@@ -30,7 +31,11 @@ export class AuthController {
       res.status(200).json({ message: "Login successful", ...result });
     } catch (error) {
       const err = error as Error;
-      res.status(401).json({ message: err.message || "Login failed" });
+      if (error instanceof ValidationError) {
+        res.status(400).json({ message: err.message });
+      } else {
+        res.status(401).json({ message: err.message || "Login failed" });
+      }
     }
   }
 

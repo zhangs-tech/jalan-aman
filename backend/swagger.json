@@ -67,7 +67,8 @@
           }
         },
         "responses": {
-          "200": { "description": "Login successful. Returns token." },
+          "200": { "description": "Login successful. Returns RS256 JWT access token." },
+          "400": { "description": "Missing required fields (email, password)" },
           "401": { "description": "Invalid credentials" }
         }
       }
