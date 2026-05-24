@@ -82,4 +82,11 @@ export default class PrismaReportRepository {
       where: { id },
     })) as ReportDTO | null;
   }
+
+  async softDelete(id: string): Promise<void> {
+    await this.prisma.report.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+  }
 }
