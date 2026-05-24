@@ -19,21 +19,23 @@ export class CommentController {
     }
 
     const { reportId } = req.params;
-    const { details } = req.body;
 
-    const result = await this.createCommentService.execute({
-      reportId: reportId as string,
-      userId: req.user.id,
-      details
-    });
+    const result = await this.createCommentService.execute(
+      req.body,
+      reportId as string,
+      req.user.id
+    );
 
-    res.status(201).json({ message: "Comment created successfully", comment: result });
+    res.status(201).json(result);
   }
 
   async getByReportId(req: Request, res: Response): Promise<void> {
     const { reportId } = req.params;
-    const comments = await this.getCommentsByReportIdService.execute(reportId as string);
-    res.status(200).json({ comments });
+    const result = await this.getCommentsByReportIdService.execute(
+      reportId as string,
+      req.query
+    );
+    res.status(200).json(result);
   }
 
   async update(req: Request, res: Response): Promise<void> {

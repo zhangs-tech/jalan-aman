@@ -76,4 +76,10 @@ export default class PrismaReportRepository {
       include: { attachments: true },
     })) as ReportDTO;
   }
+
+  async findById(id: string) {
+    return (await this.prisma.report.findUnique({
+      where: { id },
+    })) as ReportDTO | null;
+  }
 }
