@@ -125,7 +125,7 @@ class _ReportPageState extends State<ReportPage> {
                     child: ListView.separated(
                       padding: const EdgeInsets.all(AppSpacing.base),
                       itemCount: filteredReports.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (_, _) =>
                           const SizedBox(height: AppSpacing.sm),
                       itemBuilder: (_, i) => _ReportCard(
                         report: filteredReports[i],
