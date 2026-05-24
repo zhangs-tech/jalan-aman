@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import type PrismaUserRepository from "../../repositories/prisma_user_repository";
 import JwtService from "./jwt_service";
-import { ValidationError } from "./validation_error";
+import { BadRequestError, UnauthorizedError } from "../../errors";
 
 export interface LoginRequest {
   email: string;
@@ -29,19 +29,19 @@ export class LoginService {
     const { email, password } = data;
 
     if (!email || !password) {
-      throw new ValidationError("Missing required fields: email and password");
+      throw new BadRequestError("Missing required fields: email and password");
     }
 
     const user = await this.userRepository.findByEmail(email);
 
     if (!user || !user.hashedPassword) {
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
     if (!isPasswordValid) {
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     const accessToken = await this.jwtService.generate({

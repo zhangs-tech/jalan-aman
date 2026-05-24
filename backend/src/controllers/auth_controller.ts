@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import type { RegisterService } from "../services/auth/register_service";
 import type { LoginService } from "../services/auth/login_service";
-import { ValidationError } from "../services/auth/validation_error";
+import { BadRequestError, ConflictError, UnauthorizedError } from "../errors";
 
 export class AuthController {
   constructor(
@@ -20,7 +20,13 @@ export class AuthController {
         .status(201)
         .json({ message: "Registration successful", user: result });
     } catch (error) {
-      res.status(409).json({ message: "Email already registered" });
+      if (error instanceof BadRequestError) {
+        res.status(400).json({ message: error.message });
+      } else if (error instanceof ConflictError) {
+        res.status(409).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
       next(error as Error);
     }
   }
@@ -30,11 +36,12 @@ export class AuthController {
       const result = await this.loginService.execute(req.body);
       res.status(200).json({ message: "Login successful", ...result });
     } catch (error) {
-      const err = error as Error;
-      if (error instanceof ValidationError) {
-        res.status(400).json({ message: err.message });
+      if (error instanceof BadRequestError) {
+        res.status(400).json({ message: error.message });
+      } else if (error instanceof UnauthorizedError) {
+        res.status(401).json({ message: error.message });
       } else {
-        res.status(401).json({ message: err.message || "Login failed" });
+        res.status(500).json({ message: "Internal server error" });
       }
     }
   }

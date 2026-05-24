@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import type PrismaUserRepository from "../../repositories/prisma_user_repository";
+import { BadRequestError, ConflictError } from "../../errors";
 
 export interface RegisterRequest {
   email: string;
@@ -23,7 +24,7 @@ export class RegisterService {
     const { email, password, name, phone } = data;
 
     if (!email || !password || !name || !phone) {
-      throw new Error(
+      throw new BadRequestError(
         "Missing required fields: email, password, name, phone",
       );
     }
@@ -31,9 +32,7 @@ export class RegisterService {
     const existingUser = await this.userRepository.findByEmail(email);
 
     if (existingUser) {
-      throw new Error(
-        "Email or username already exists",
-      );
+      throw new ConflictError("Email already registered");
     }
 
     const salt = await bcrypt.genSalt(10);
