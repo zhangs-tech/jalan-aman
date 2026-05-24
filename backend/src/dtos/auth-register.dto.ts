@@ -10,7 +10,7 @@ import type { UserDTO } from "./user.dto";
 // ---------------------------------------------------------------------------
 
 export const registerSchema = z.object({
-  email: z.string().email("email must be a valid email address"),
+  email: z.email("email must be a valid email address"),
   password: z
     .string()
     .min(8, "password must be at least 8 characters")
