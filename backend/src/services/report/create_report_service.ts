@@ -1,5 +1,6 @@
 import { ReportStatus } from "../../generated/prisma/client";
 import PrismaReportRepository from "../../repositories/prisma_report_repository";
+import { BadRequestError } from "../../errors";
 
 export class CreateReportService {
   constructor(private readonly reportRepository: PrismaReportRepository) {}
@@ -15,7 +16,7 @@ export class CreateReportService {
     zipCode: string;
   }) {
     if (!data.description || !data.latitude || !data.longitude || !data.address) {
-      throw new Error("Missing required fields for report creation.");
+      throw new BadRequestError("Missing required fields for report creation.");
     }
 
     return await this.reportRepository.create({

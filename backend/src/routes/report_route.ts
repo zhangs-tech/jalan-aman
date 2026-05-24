@@ -26,18 +26,18 @@ const reportController = new ReportController(
 
 export const reportRouter = Router();
 
-reportRouter.post("/", authMiddleware, (req, res, next) =>
-  reportController.create(req, res, next)
+reportRouter.post("/", authMiddleware, (req, res) =>
+  reportController.create(req, res)
 );
-reportRouter.get("/", authMiddleware, (req, res, next) =>
-  reportController.getAll(req, res, next)
+reportRouter.get("/", authMiddleware, (req, res) =>
+  reportController.getAll(req, res)
 );
-reportRouter.get("/user/me", authMiddleware, (req, res, next) =>
-  reportController.getByUser(req, res, next)
+reportRouter.get("/user/me", authMiddleware, (req, res) =>
+  reportController.getByUser(req, res)
 );
-reportRouter.get("/:id", authMiddleware, (req, res, next) =>
-  reportController.getById(req, res, next)
+reportRouter.get("/:id", authMiddleware, (req, res) =>
+  reportController.getById(req, res)
 );
-reportRouter.patch("/:id/status", authMiddleware, (req, res, next) =>
-  reportController.updateStatus(req, res, next)
+reportRouter.patch("/:id/status", authMiddleware, (req, res) =>
+  reportController.updateStatus(req, res)
 );

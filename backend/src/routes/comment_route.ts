@@ -23,18 +23,18 @@ const commentController = new CommentController(
 
 export const commentRouter = Router({ mergeParams: true });
 
-commentRouter.post("/", authMiddleware, (req, res, next) =>
-  commentController.create(req, res, next)
+commentRouter.post("/", authMiddleware, (req, res) =>
+  commentController.create(req, res)
 );
 
-commentRouter.get("/", authMiddleware, (req, res, next) =>
-  commentController.getByReportId(req, res, next)
+commentRouter.get("/", authMiddleware, (req, res) =>
+  commentController.getByReportId(req, res)
 );
 
-commentRouter.patch("/:commentId", authMiddleware, (req, res, next) =>
-  commentController.update(req, res, next)
+commentRouter.patch("/:commentId", authMiddleware, (req, res) =>
+  commentController.update(req, res)
 );
 
-commentRouter.delete("/:commentId", authMiddleware, (req, res, next) =>
-  commentController.delete(req, res, next)
+commentRouter.delete("/:commentId", authMiddleware, (req, res) =>
+  commentController.delete(req, res)
 );

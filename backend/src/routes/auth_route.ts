@@ -15,18 +15,18 @@ const authController = new AuthController(registerService, loginService);
 
 export const authRouter = Router();
 
-authRouter.post("/register", (req, res, next) =>
-  authController.register(req, res, next),
+authRouter.post("/register", (req, res) =>
+  authController.register(req, res),
 );
 
-authRouter.post("/login", (req, res, next) =>
-  authController.login(req, res, next),
+authRouter.post("/login", (req, res) =>
+  authController.login(req, res),
 );
 
-authRouter.get("/me", authMiddleware, (req, res, next) =>
-  authController.getMe(req, res, next),
+authRouter.get("/me", authMiddleware, (req, res) =>
+  authController.getMe(req, res),
 );
 
-authRouter.post("/logout", authMiddleware, (req, res, next) =>
-  authController.logout(req, res, next),
+authRouter.post("/logout", authMiddleware, (req, res) =>
+  authController.logout(req, res),
 );
