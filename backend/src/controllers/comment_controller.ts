@@ -22,8 +22,8 @@ export class CommentController {
     const { details } = req.body;
 
     const result = await this.createCommentService.execute({
-      reportID: reportId as string,
-      userID: req.user.id,
+      reportId: reportId as string,
+      userId: req.user.id,
       details
     });
 
