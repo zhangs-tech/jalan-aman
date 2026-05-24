@@ -2,8 +2,9 @@ import bcrypt from "bcrypt";
 import type PrismaUserRepository from "../../repositories/prisma_user_repository";
 import JwtService from "./jwt_service";
 import { UnauthorizedError } from "../../errors";
-import { validateLogin } from "../../dtos/auth.dto";
-import type { AuthLoginResponse, UserDTO } from "../../dtos/auth.dto";
+import { validateLogin } from "../../dtos/auth-login.dto";
+import type { AuthLoginResponse } from "../../dtos/auth-login.dto";
+import type { UserDTO } from "../../dtos/user.dto";
 
 export class LoginService {
   constructor(

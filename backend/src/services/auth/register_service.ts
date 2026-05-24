@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import type PrismaUserRepository from "../../repositories/prisma_user_repository";
 import { ConflictError } from "../../errors";
-import { validateRegister } from "../../dtos/auth.dto";
-import type { AuthRegisterResponse, UserDTO } from "../../dtos/auth.dto";
+import { validateRegister } from "../../dtos/auth-register.dto";
+import type { AuthRegisterResponse } from "../../dtos/auth-register.dto";
+import type { UserDTO } from "../../dtos/user.dto";
 
 export class RegisterService {
   constructor(private readonly userRepository: PrismaUserRepository) {}
