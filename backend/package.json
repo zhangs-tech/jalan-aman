@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "bun test --pass-with-no-tests",
+    "test:integration": "bun test ./tests/integration/reports.integration.ts",
+    "test:integration:run": "docker compose -f compose.test.yml up -d --wait && bun run test:integration; docker compose -f compose.test.yml down -v",
+    "test:integration:up": "docker compose -f compose.test.yml up -d --wait",
+    "test:integration:down": "docker compose -f compose.test.yml down -v",
     "genkey": "bun run scripts/genkey.ts",
     "dev": "bun run index.ts",
     "db": "bun --bun prisma"
@@ -15,7 +19,6 @@
   "packageManager": "pnpm@10.24.0",
   "private": true,
   "devDependencies": {
-    "@testcontainers/postgresql": "^12.0.0",
     "@types/bcrypt": "^6.0.0",
     "@types/bun": "latest",
     "@types/express": "^5.0.6",
