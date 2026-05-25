@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jalan_aman/components/app_icon.dart';
 import 'package:jalan_aman/pages/home_page.dart';
 import 'package:jalan_aman/pages/landing_page.dart';
-import 'package:jalan_aman/services/api/auth_service.dart';
+import 'package:jalan_aman/providers/auth_providers.dart';
 import 'package:jalan_aman/services/location_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
 
@@ -12,13 +13,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   LocationService.checkLocationService();
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.light;
@@ -28,37 +28,35 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Jalan Aman',
-      // debugShowCheckedModeBanner: false,
       theme: theme.copyWith(textTheme: textTheme),
       home: const _AuthGate(),
     );
   }
 }
 
-class _AuthGate extends StatefulWidget {
+class _AuthGate extends ConsumerStatefulWidget {
   const _AuthGate();
 
   @override
-  State<_AuthGate> createState() => _AuthGateState();
+  ConsumerState<_AuthGate> createState() => _AuthGateState();
 }
 
-class _AuthGateState extends State<_AuthGate> {
+class _AuthGateState extends ConsumerState<_AuthGate> {
   @override
   void initState() {
     super.initState();
-    _resolve();
-  }
-
-  Future<void> _resolve() async {
-    final authenticated = await AuthService.isAuthenticated();
-    if (!mounted) return;
-
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => authenticated ? const HomePage() : const LandingPage(),
-      ),
-      (_) => false,
-    );
+    ref.listenManual(authStateProvider, (prev, next) {
+      if (next.status != AuthStatus.unknown) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => next.status == AuthStatus.authenticated
+                ? const HomePage()
+                : const LandingPage(),
+          ),
+          (_) => false,
+        );
+      }
+    });
   }
 
   @override
@@ -67,7 +65,7 @@ class _AuthGateState extends State<_AuthGate> {
       backgroundColor: AppColors.primary,
       body: Center(
         child: AppIcon(),
-        ),
+      ),
     );
   }
 }

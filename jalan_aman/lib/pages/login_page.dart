@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jalan_aman/components/buttons.dart';
 import 'package:jalan_aman/components/card.dart';
 import 'package:jalan_aman/components/text_field.dart';
 import 'package:jalan_aman/pages/home_page.dart';
 import 'package:jalan_aman/pages/register_page.dart';
-import 'package:jalan_aman/services/api/auth_service.dart';
+import 'package:jalan_aman/providers/auth_providers.dart';
 import 'package:jalan_aman/theme/theme.dart';
 import 'package:jalan_aman/utils/form_validator.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _emailController = TextEditingController();
@@ -47,29 +48,28 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     try {
-      final result = await AuthService.login(
-        email: _emailController.text,
-        password: _passwordController.text,
+      final success = await ref.read(authStateProvider.notifier).login(
+        _emailController.text,
+        _passwordController.text,
       );
-      // print(result);
 
       if (!mounted) return;
-      final statusCode = result["statusCode"];
-
+      final messenger = ScaffoldMessenger.of(context);
       messenger.hideCurrentSnackBar();
-      if (statusCode == 200) {
+      if (success) {
         messenger.showSnackBar(const SnackBar(content: Text("Login Success")));
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
-      } else if (statusCode == 401) {
+      } else {
         messenger.showSnackBar(const SnackBar(content: Text("Login Failed")));
       }
     } catch (e) {
       if (!mounted) return;
-      messenger.hideCurrentSnackBar();
-      messenger.showSnackBar(const SnackBar(content: Text("Connection Error")));
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text("Connection Error")));
     } finally {
       if (mounted) {
         setState(() {

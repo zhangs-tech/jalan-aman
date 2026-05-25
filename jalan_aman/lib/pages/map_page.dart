@@ -2,26 +2,25 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jalan_aman/providers/profile_providers.dart';
 import 'package:jalan_aman/services/location_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class MapPage extends StatefulWidget {
+class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
 
   @override
-  State<MapPage> createState() => _MapPageState();
+  ConsumerState<MapPage> createState() => _MapPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends ConsumerState<MapPage> {
   final MapController _mapController = MapController();
   StreamSubscription? _locationSubs;
 
   //default location -Jakarta
   LatLng _currentPosition = const LatLng(-6.2088, 106.8456);
-
-  String _username = '';
 
   Map<String, dynamic>? _selectedReport;
 
@@ -62,7 +61,6 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    _loadUserName();
     _initLiveLocation();
   }
 
@@ -71,14 +69,6 @@ class _MapPageState extends State<MapPage> {
     _locationSubs?.cancel();
     _mapController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-    setState(() {
-      _username = prefs.getString('name') ?? 'User';
-    });
   }
 
   Future<void> _initLiveLocation() async {
@@ -99,6 +89,9 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final profileAsync = ref.watch(userProfileProvider);
+    final username = profileAsync.valueOrNull?['name'] ?? 'User';
+
     return Scaffold(
       body: Stack(
         children: [
@@ -111,7 +104,7 @@ class _MapPageState extends State<MapPage> {
             }),
           ),
 
-          _GreetingBar(userName: _username),
+          _GreetingBar(userName: username),
 
           Positioned(
             right: AppSpacing.base,

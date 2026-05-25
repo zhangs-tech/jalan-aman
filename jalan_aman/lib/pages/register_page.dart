@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jalan_aman/components/buttons.dart';
 import 'package:jalan_aman/components/card.dart';
 import 'package:jalan_aman/components/text_field.dart';
 import 'package:jalan_aman/pages/login_page.dart';
-import 'package:jalan_aman/services/api/auth_service.dart';
+import 'package:jalan_aman/providers/auth_providers.dart';
 import 'package:jalan_aman/theme/theme.dart';
 import 'package:jalan_aman/utils/form_validator.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
@@ -50,7 +51,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     try {
-      final result = await AuthService.register(
+      final result = await ref.read(authStateProvider.notifier).register(
         name: _nameController.text,
         phone: _phoneController.text,
         email: _emailController.text,
