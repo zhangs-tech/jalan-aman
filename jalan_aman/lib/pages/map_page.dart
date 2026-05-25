@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jalan_aman/models/report_type.dart';
 import 'package:jalan_aman/providers/profile_providers.dart';
 import 'package:jalan_aman/services/location_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
@@ -19,7 +20,6 @@ class _MapPageState extends ConsumerState<MapPage> {
   final MapController _mapController = MapController();
   StreamSubscription? _locationSubs;
 
-  //default location -Jakarta
   LatLng _currentPosition = const LatLng(-6.2088, 106.8456);
 
   Map<String, dynamic>? _selectedReport;
@@ -27,32 +27,25 @@ class _MapPageState extends ConsumerState<MapPage> {
   final List<Map<String, dynamic>> _reports = [
     {
       'id': '1',
-      'status': 'Pending',
-      'title': 'Jalan Sudirman, Dekat Halte',
-      'description':
-          'Lubang besar di lajur kiri, bahaya untuk pengendara motor.',
+      'reportType': 'pothole',
+      'description': 'Lubang besar di lajur kiri, bahaya untuk pengendara motor.',
       'address': 'Jl. Sudirman, Jakarta Pusat',
-      'timeAgo': '2 jam lalu',
       'lat': -6.2088,
       'lng': 106.8456,
     },
     {
       'id': '2',
-      'status': 'In Progress',
-      'title': 'Lampu Jalan Mati',
+      'reportType': 'broken_traffic_light',
       'description': 'Lampu jalan tidak menyala sejak 3 hari lalu.',
       'address': 'Jl. Thamrin, Jakarta Pusat',
-      'timeAgo': '5 jam lalu',
       'lat': -6.1944,
       'lng': 106.8229,
     },
     {
       'id': '3',
-      'status': 'Resolved',
-      'title': 'Drainase Tersumbat',
-      'description': 'Got terasa sudah diperbaiki.',
+      'reportType': 'flood',
+      'description': 'Drainase tersumbat menyebabkan genangan air.',
       'address': 'Jl. Gatot Subroto, Jakarta',
-      'timeAgo': '1 hari lalu',
       'lat': -6.2297,
       'lng': 106.8197,
     },
@@ -159,12 +152,12 @@ class _Map extends StatelessWidget {
                 height: 36,
                 child: GestureDetector(
                   onTap: () => onPinTap(report),
-                  child: _ReportPin(status: report['status']),
+                  child:
+                      _ReportPin(reportType: ReportType.fromString(report['reportType'])),
                 ),
               ),
             ),
 
-            //user current location pin
             Marker(
               point: currentPosition,
               width: 18,
@@ -175,13 +168,11 @@ class _Map extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.border, width: 2),
                   boxShadow: [
-                    // A standard drop shadow for depth
                     const BoxShadow(
                       color: Colors.black26,
                       blurRadius: 4,
                       offset: Offset(0, 2),
                     ),
-                    // A colored "glow" shadow that spreads out
                     BoxShadow(
                       color: AppColors.info.withValues(alpha: 153),
                       blurRadius: 12,
@@ -199,34 +190,19 @@ class _Map extends StatelessWidget {
 }
 
 class _ReportPin extends StatelessWidget {
-  const _ReportPin({required this.status});
+  const _ReportPin({required this.reportType});
 
-  final String status;
-
-  IconData get _icon {
-    switch (status) {
-      case 'Pending':
-        return Icons.warning_rounded;
-      case 'In Progress':
-        return Icons.settings_rounded;
-      case 'Resolved':
-        return Icons.check_rounded;
-      case 'Rejected':
-        return Icons.close_rounded;
-      default:
-        return Icons.circle;
-    }
-  }
+  final ReportType reportType;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.pinColor(status),
+        color: reportType.color,
         shape: BoxShape.circle,
         boxShadow: AppShadows.card,
       ),
-      child: Icon(_icon, color: Colors.white, size: 18),
+      child: Icon(reportType.icon, color: Colors.white, size: 18),
     );
   }
 }

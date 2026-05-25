@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jalan_aman/components/card.dart';
+import 'package:jalan_aman/models/report_type.dart';
 import 'package:jalan_aman/theme/theme.dart';
 
 class ReportPage extends StatefulWidget {
@@ -12,15 +13,7 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> {
   bool _isLoading = true;
   List<Map<String, dynamic>> _reports = [];
-  String _selectedStatus = 'All';
-
-  static const List<String> _statusFilters = [
-    'All',
-    'Pending',
-    'In Progress',
-    'Resolved',
-    'Rejected',
-  ];
+  ReportType? _selectedReportType;
 
   @override
   void initState() {
@@ -41,43 +34,49 @@ class _ReportPageState extends State<ReportPage> {
       _reports = [
         {
           'id': '1',
-          'title': 'Jalan Sudirman, Dekat Halte',
           'description':
               'Lubang besar di lajur kiri, bahaya untuk pengendara motor.',
           'address': 'Jl. Sudirman, Jakarta Pusat',
-          'status': 'Pending',
-          'timeAgo': '2 jam lalu',
+          'reportType': 'pothole',
+          'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
         },
         {
           'id': '2',
-          'title': 'Lampu Jalan Mati',
           'description': 'Lampu jalan tidak menyala sejak 3 hari lalu.',
           'address': 'Jl. Thamrin, Jakarta Pusat',
-          'status': 'In Progress',
-          'timeAgo': '1 hari lalu',
+          'reportType': 'broken_traffic_light',
+          'createdAt': DateTime.now().subtract(const Duration(hours: 5)),
         },
         {
           'id': '3',
-          'title': 'Drainase Tersumbat',
           'description': 'Got sudah diperbaiki oleh petugas.',
           'address': 'Jl. Gatot Subroto, Jakarta',
-          'status': 'Resolved',
-          'timeAgo': '3 hari lalu',
+          'reportType': 'flood',
+          'createdAt': DateTime.now().subtract(const Duration(days: 1)),
+        },
+        {
+          'id': '4',
+          'description': 'Kecelakaan mobil di perempatan.',
+          'address': 'Jl. Kuningan, Jakarta Selatan',
+          'reportType': 'accident',
+          'createdAt': DateTime.now().subtract(const Duration(hours: 1)),
+        },
+        {
+          'id': '5',
+          'description': 'Ada polisi mengatur lalu lintas.',
+          'address': 'Jl. Rasuna Said, Jakarta Selatan',
+          'reportType': 'police',
+          'createdAt': DateTime.now().subtract(const Duration(minutes: 30)),
         },
       ];
     });
   }
 
   List<Map<String, dynamic>> get _filteredReports {
-    if (_selectedStatus == 'All') {
-      return _reports;
-    }
-
-    final selected = _selectedStatus.toLowerCase();
+    if (_selectedReportType == null) return _reports;
+    final typeValue = _selectedReportType!.value;
     return _reports
-        .where(
-          (report) => (report['status'] as String).toLowerCase() == selected,
-        )
+        .where((report) => report['reportType'] == typeValue)
         .toList();
   }
 
@@ -100,41 +99,40 @@ class _ReportPageState extends State<ReportPage> {
       ),
       body: Column(
         children: [
-          _StatusFilterRow(
-            statuses: _statusFilters,
-            selectedStatus: _selectedStatus,
-            onSelected: (status) {
-              setState(() => _selectedStatus = status);
+          _ReportTypeFilterRow(
+            selectedType: _selectedReportType,
+            onSelected: (type) {
+              setState(() => _selectedReportType = type);
             },
           ),
           Expanded(
             child: _isLoading
                 ? const _LoadingList()
                 : filteredReports.isEmpty
-                ? _reports.isEmpty
-                      ? const _EmptyState()
-                      : _FilteredEmptyState(
-                          status: _selectedStatus,
-                          onClear: () {
-                            setState(() => _selectedStatus = 'All');
-                          },
-                        )
-                : RefreshIndicator(
-                    color: AppColors.primary,
-                    onRefresh: _fetchReports,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.all(AppSpacing.base),
-                      itemCount: filteredReports.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(height: AppSpacing.sm),
-                      itemBuilder: (_, i) => _ReportCard(
-                        report: filteredReports[i],
-                        onTap: () {
-                          // TODO: Navigator.pushNamed(context, '/reports/${filteredReports[i]['id']}');
-                        },
+                    ? _selectedReportType != null
+                        ? _FilteredEmptyState(
+                            label: _selectedReportType!.label,
+                            onClear: () {
+                              setState(() => _selectedReportType = null);
+                            },
+                          )
+                        : const _EmptyState()
+                    : RefreshIndicator(
+                        color: AppColors.primary,
+                        onRefresh: _fetchReports,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(AppSpacing.base),
+                          itemCount: filteredReports.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: AppSpacing.sm),
+                          itemBuilder: (_, i) => _ReportCard(
+                            report: filteredReports[i],
+                            onTap: () {
+                              // TODO: Navigator.pushNamed(context, '/reports/${filteredReports[i]['id']}');
+                            },
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
           ),
         ],
       ),
@@ -142,19 +140,19 @@ class _ReportPageState extends State<ReportPage> {
   }
 }
 
-class _StatusFilterRow extends StatelessWidget {
-  const _StatusFilterRow({
-    required this.statuses,
-    required this.selectedStatus,
+class _ReportTypeFilterRow extends StatelessWidget {
+  const _ReportTypeFilterRow({
+    required this.selectedType,
     required this.onSelected,
   });
 
-  final List<String> statuses;
-  final String selectedStatus;
-  final ValueChanged<String> onSelected;
+  final ReportType? selectedType;
+  final ValueChanged<ReportType?> onSelected;
 
   @override
   Widget build(BuildContext context) {
+    final types = <ReportType?>[null, ...ReportType.values];
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.base,
@@ -165,14 +163,14 @@ class _StatusFilterRow extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: statuses
+          children: types
               .map(
-                (status) => Padding(
+                (type) => Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.md),
-                  child: _StatusFilterPill(
-                    status: status,
-                    isSelected: status == selectedStatus,
-                    onTap: () => onSelected(status),
+                  child: _TypeFilterPill(
+                    type: type,
+                    isSelected: type == selectedType,
+                    onTap: () => onSelected(type),
                   ),
                 ),
               )
@@ -183,26 +181,25 @@ class _StatusFilterRow extends StatelessWidget {
   }
 }
 
-class _StatusFilterPill extends StatelessWidget {
-  const _StatusFilterPill({
-    required this.status,
+class _TypeFilterPill extends StatelessWidget {
+  const _TypeFilterPill({
+    required this.type,
     required this.isSelected,
     required this.onTap,
   });
 
-  final String status;
+  final ReportType? type;
   final bool isSelected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final bool isAll = status == 'All';
+    final isAll = type == null;
     final Color background = isAll
         ? AppColors.surfaceVariant
-        : AppColors.statusBackground(status);
-    final Color foreground = isAll
-        ? AppColors.textSecondary
-        : AppColors.statusForeground(status);
+        : type!.color.withValues(alpha: 0.12);
+    final Color foreground =
+        isAll ? AppColors.textSecondary : type!.color;
 
     return GestureDetector(
       onTap: onTap,
@@ -230,7 +227,7 @@ class _StatusFilterPill extends StatelessWidget {
               : const [],
         ),
         child: Text(
-          status,
+          isAll ? 'All' : type!.label,
           style: AppTextStyles.labelSmall.copyWith(
             color: foreground,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
@@ -241,7 +238,6 @@ class _StatusFilterPill extends StatelessWidget {
   }
 }
 
-// ── Report Card ──────────────────────────────────────────────────
 class _ReportCard extends StatelessWidget {
   const _ReportCard({required this.report, required this.onTap});
 
@@ -250,6 +246,9 @@ class _ReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reportType = ReportType.fromString(report['reportType']);
+    final createdAt = report['createdAt'] as DateTime? ?? DateTime.now();
+
     return GestureDetector(
       onTap: onTap,
       child: Cards(
@@ -257,47 +256,46 @@ class _ReportCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Thumbnail placeholder
             Container(
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: reportType.color.withValues(alpha: 0.12),
                 borderRadius: AppRadius.inputRadius,
               ),
-              child: const Icon(
-                Icons.add_road_rounded,
-                color: AppColors.textTertiary,
+              child: Icon(
+                reportType.icon,
+                color: reportType.color,
                 size: 28,
               ),
             ),
+
             const SizedBox(width: AppSpacing.md),
 
-            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // status n time
                   Row(
                     children: [
-                      _StatusBadge(status: report['status']),
+                      _ReportTypeBadge(reportType: reportType),
                       const Spacer(),
-                      Text(report['timeAgo'], style: AppTextStyles.caption),
+                      Text(
+                        _timeAgo(createdAt),
+                        style: AppTextStyles.caption,
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
 
-                  // title
                   Text(
-                    report['title'],
+                    reportType.label,
                     style: AppTextStyles.h3,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppSpacing.xs),
 
-                  // address
                   Row(
                     children: [
                       const Icon(
@@ -320,7 +318,6 @@ class _ReportCard extends StatelessWidget {
               ),
             ),
 
-            // Chevron
             const Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textTertiary,
@@ -331,12 +328,19 @@ class _ReportCard extends StatelessWidget {
       ),
     );
   }
+
+  String _timeAgo(DateTime createdAt) {
+    final diff = DateTime.now().difference(createdAt);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
+  }
 }
 
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.status});
+class _ReportTypeBadge extends StatelessWidget {
+  const _ReportTypeBadge({required this.reportType});
 
-  final String status;
+  final ReportType reportType;
 
   @override
   Widget build(BuildContext context) {
@@ -346,13 +350,13 @@ class _StatusBadge extends StatelessWidget {
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.statusBackground(status),
+        color: reportType.color.withValues(alpha: 0.12),
         borderRadius: AppRadius.pillRadius,
       ),
       child: Text(
-        status,
+        reportType.label,
         style: AppTextStyles.labelSmall.copyWith(
-          color: AppColors.statusForeground(status),
+          color: reportType.color,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -360,6 +364,7 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
+// ── Loading ──────────────────────────────────────────────────────
 class _LoadingList extends StatelessWidget {
   const _LoadingList();
 
@@ -384,7 +389,6 @@ class _SkeletonCard extends StatelessWidget {
       appSpacing: Spacing.base,
       child: Row(
         children: [
-          // Thumbnail skeleton
           Container(
             width: 72,
             height: 72,
@@ -415,7 +419,7 @@ class _SkeletonCard extends StatelessWidget {
   }
 }
 
-// ── Empty State ───────────────────────────────────────────────────
+// ── Empty States ──────────────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 
@@ -441,9 +445,9 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _FilteredEmptyState extends StatelessWidget {
-  const _FilteredEmptyState({required this.status, required this.onClear});
+  const _FilteredEmptyState({required this.label, required this.onClear});
 
-  final String status;
+  final String label;
   final VoidCallback onClear;
 
   @override
@@ -454,10 +458,10 @@ class _FilteredEmptyState extends StatelessWidget {
         children: [
           Icon(Icons.filter_alt_off, size: 64, color: AppColors.textTertiary),
           const SizedBox(height: AppSpacing.base),
-          Text('No reports for $status', style: AppTextStyles.h3),
+          Text('No reports for $label', style: AppTextStyles.h3),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Try another status or clear the filter.',
+            'Try another type or clear the filter.',
             style: AppTextStyles.bodySmall,
             textAlign: TextAlign.center,
           ),
