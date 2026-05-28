@@ -7,6 +7,7 @@ import type { ListReportsService } from "../services/report/list_reports_service
 import type { MapPinsService } from "../services/report/map_pins_service";
 import type { GetReportDetailService } from "../services/report/get_report_detail_service";
 import type { GetAttachmentDownloadService } from "../services/report/get_attachment_download_service";
+import type { StreamAttachmentService } from "../services/report/stream_attachment_service";
 import type { GetReportsByUserService } from "../services/report/get_reports_by_user_service";
 import JwtService from "../services/auth/jwt_service";
 import { UnauthorizedError } from "../errors";
@@ -23,7 +24,8 @@ export class ReportController {
     private readonly mapPinsService: MapPinsService,
     private readonly getReportDetailService: GetReportDetailService,
     private readonly getAttachmentDownloadService: GetAttachmentDownloadService,
-    private readonly getReportsByUserService: GetReportsByUserService
+    private readonly getReportsByUserService: GetReportsByUserService,
+    private readonly streamAttachmentService: StreamAttachmentService
   ) {}
 
   async create(req: Request, res: Response): Promise<void> {
@@ -69,6 +71,34 @@ export class ReportController {
     );
 
     res.status(200).json(result);
+  }
+
+  async streamAttachment(req: Request, res: Response): Promise<void> {
+    const { reportId, attachmentId } = req.params;
+    const { stream, mimeType, fileSize } = await this.streamAttachmentService.execute(
+      reportId as string,
+      attachmentId as string
+    );
+
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Content-Length", fileSize);
+    res.setHeader("Cache-Control", "private, max-age=3600, immutable");
+    res.status(200);
+
+    const reader = stream.getReader();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+      res.end();
+    } catch {
+      reader.cancel();
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Failed to stream attachment" });
+      }
+    }
   }
 
   async getMap(req: Request, res: Response): Promise<void> {
