@@ -15,6 +15,9 @@ export class S3Service {
         secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "secret",
       },
       forcePathStyle: true,
+      // SeaweedFS S3 does not consistently support optional checksum params
+      // added by recent AWS SDK defaults in presigned PUT URLs.
+      requestChecksumCalculation: "WHEN_REQUIRED",
     });
   }
 
