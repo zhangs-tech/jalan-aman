@@ -6,24 +6,38 @@ enum Spacing { xs, sm, md, base, lg, xl, xxl, xxxl }
 class Cards extends StatelessWidget {
   const Cards({
     super.key,
+    this.width,
     this.height,
     this.appSpacing = Spacing.xl,
+    this.padding,
+    this.color = AppColors.surface,
+    this.borderRadius = AppRadius.cardRadius,
+    this.border,
+    this.boxShadow = AppShadows.card,
     this.child,
   });
 
+  final double? width;
   final double? height;
   final Spacing appSpacing;
+  final EdgeInsetsGeometry? padding;
+  final Color color;
+  final BorderRadius borderRadius;
+  final Border? border;
+  final List<BoxShadow> boxShadow;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: width,
       height: height,
-      padding: EdgeInsets.all(_appSpacing),
+      padding: padding ?? EdgeInsets.all(_appSpacing),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.cardRadius,
-        boxShadow: AppShadows.card,
+        color: color,
+        borderRadius: borderRadius,
+        border: border,
+        boxShadow: boxShadow,
       ),
       child: child,
     );
