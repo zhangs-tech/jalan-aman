@@ -5,7 +5,7 @@ import 'package:jalan_aman/services/secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class ApiClient {
-  static String get _baseUrl {
+  static String get baseUrl {
     final url = dotenv.env['API_BASE_URL'];
     if (url != null) return url;
 
@@ -13,6 +13,12 @@ class ApiClient {
       return 'http://10.0.2.2:3000';
     }
     return 'http://localhost:3000';
+  }
+
+  static Future<Map<String, String>> getAuthHeaders() async {
+    final token = await SecureStorage.read('accessToken');
+    if (token == null) return const {};
+    return {'Authorization': 'Bearer $token'};
   }
 
   static dynamic _decodeBody(String body) {
@@ -40,7 +46,7 @@ class ApiClient {
     bool auth = false,
   }) async {
     final response = await http.get(
-      Uri.parse('$_baseUrl$endpoint'),
+      Uri.parse('$baseUrl$endpoint'),
       headers: await _headers(auth: auth),
     );
     return {
@@ -55,7 +61,7 @@ class ApiClient {
     bool auth = false,
   }) async {
     final response = await http.post(
-      Uri.parse('$_baseUrl$endpoint'),
+      Uri.parse('$baseUrl$endpoint'),
       headers: await _headers(auth: auth),
       body: jsonEncode(body),
     );
@@ -71,7 +77,7 @@ class ApiClient {
     bool auth = false,
   }) async {
     final response = await http.put(
-      Uri.parse('$_baseUrl$endpoint'),
+      Uri.parse('$baseUrl$endpoint'),
       headers: await _headers(auth: auth),
       body: jsonEncode(body),
     );
@@ -87,7 +93,7 @@ class ApiClient {
     bool auth = false,
   }) async {
     final response = await http.patch(
-      Uri.parse('$_baseUrl$endpoint'),
+      Uri.parse('$baseUrl$endpoint'),
       headers: await _headers(auth: auth),
       body: jsonEncode(body),
     );
@@ -102,7 +108,7 @@ class ApiClient {
     bool auth = false,
   }) async {
     final response = await http.delete(
-      Uri.parse('$_baseUrl$endpoint'),
+      Uri.parse('$baseUrl$endpoint'),
       headers: await _headers(auth: auth),
     );
     return {
