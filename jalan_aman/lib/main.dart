@@ -6,13 +6,11 @@ import 'package:jalan_aman/components/app_icon.dart';
 import 'package:jalan_aman/pages/home_page.dart';
 import 'package:jalan_aman/pages/landing_page.dart';
 import 'package:jalan_aman/providers/auth_providers.dart';
-import 'package:jalan_aman/services/location_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-  LocationService.checkLocationService();
   runApp(const ProviderScope(child: MyApp()));
 }
 
