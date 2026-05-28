@@ -6,6 +6,7 @@ import 'package:jalan_aman/components/text_field.dart';
 import 'package:jalan_aman/pages/home_page.dart';
 import 'package:jalan_aman/pages/register_page.dart';
 import 'package:jalan_aman/providers/auth_providers.dart';
+import 'package:jalan_aman/providers/session_providers.dart';
 import 'package:jalan_aman/theme/theme.dart';
 import 'package:jalan_aman/utils/form_validator.dart';
 
@@ -48,19 +49,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
 
     try {
-      final success = await ref.read(authStateProvider.notifier).login(
-        _emailController.text,
-        _passwordController.text,
-      );
+      final success = await ref
+          .read(authStateProvider.notifier)
+          .login(_emailController.text, _passwordController.text);
 
       if (!mounted) return;
       final messenger = ScaffoldMessenger.of(context);
       messenger.hideCurrentSnackBar();
       if (success) {
+        invalidateSessionScopedProviders(ref);
         messenger.showSnackBar(const SnackBar(content: Text("Login Success")));
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false,
         );
       } else {
         messenger.showSnackBar(const SnackBar(content: Text("Login Failed")));
