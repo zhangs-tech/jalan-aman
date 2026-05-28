@@ -50,4 +50,19 @@ export class S3Service {
       expiresIn: expiresInSeconds,
     });
   }
+
+  async getObjectStream(s3Key: string): Promise<ReadableStream> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: s3Key,
+    });
+
+    const response = await this.client.send(command);
+
+    if (!response.Body) {
+      throw new Error("S3 object body is empty");
+    }
+
+    return response.Body.transformToWebStream();
+  }
 }
