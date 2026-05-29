@@ -11,9 +11,9 @@ import 'package:jalan_aman/models/report_models.dart';
 import 'package:jalan_aman/models/report_type.dart';
 import 'package:jalan_aman/pages/create_report_page.dart';
 import 'package:jalan_aman/pages/report_detail_page.dart';
+import 'package:jalan_aman/providers/location_providers.dart';
 import 'package:jalan_aman/providers/map_pins_provider.dart';
 import 'package:jalan_aman/providers/profile_providers.dart';
-import 'package:jalan_aman/services/location_service.dart';
 import 'package:jalan_aman/services/report_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
 import 'package:jalan_aman/utils/report_refresh.dart';
@@ -29,63 +29,37 @@ class MapPage extends ConsumerStatefulWidget {
 
 class _MapPageState extends ConsumerState<MapPage> {
   final MapController _mapController = MapController();
-  StreamSubscription? _locationSubs;
   Timer? _boundsDebounce;
 
   LatLng _currentPosition = const LatLng(-6.2088, 106.8456);
   MapBoundsModel? _bounds;
   ReportType? _selectedType;
   bool _hasCenteredOnUser = false;
-  bool _locationResolved = false;
   bool _isMapReady = false;
   LatLng? _pendingCenter;
 
   @override
-  void initState() {
-    super.initState();
-    _initLiveLocation();
-  }
-
-  @override
   void dispose() {
-    _locationSubs?.cancel();
     _boundsDebounce?.cancel();
     _mapController.dispose();
     super.dispose();
   }
 
-  Future<void> _initLiveLocation() async {
-    final current = await LocationService.getCurrentLocation();
-    if (!mounted) return;
+  void _centerOnUser() {
+    _moveMapTo(_currentPosition);
+  }
 
-    if (current == null) {
-      setState(() => _locationResolved = true);
-      return;
-    }
+  void _syncDetectedPosition(LatLng? position) {
+    if (position == null || position == _currentPosition) return;
 
-    final point = LatLng(current.latitude, current.longitude);
-    setState(() {
-      _currentPosition = point;
-      _locationResolved = true;
-    });
-    _moveMapTo(point);
-    _hasCenteredOnUser = true;
-
-    _locationSubs = LocationService.getLivePosition()?.listen((position) {
-      if (!mounted) return;
-      final point = LatLng(position.latitude, position.longitude);
-      setState(() {
-        _currentPosition = point;
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || position == _currentPosition) return;
+      setState(() => _currentPosition = position);
       if (!_hasCenteredOnUser) {
-        _moveMapTo(point);
+        _moveMapTo(position);
         _hasCenteredOnUser = true;
       }
     });
-  }
-
-  void _centerOnUser() {
-    _moveMapTo(_currentPosition);
   }
 
   void _onMapReady() {
@@ -144,17 +118,12 @@ class _MapPageState extends ConsumerState<MapPage> {
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider);
+    final positionAsync = ref.watch(currentPositionProvider);
     final username = profileAsync.valueOrNull?['name'] ?? 'User';
     final pinsAsync = _bounds == null
         ? const AsyncValue<List<MapPinModel>>.loading()
         : ref.watch(mapPinsProvider(_bounds!));
-
-    if (!_locationResolved) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    positionAsync.whenData(_syncDetectedPosition);
 
     return Scaffold(
       body: Stack(
