@@ -93,7 +93,7 @@ class _AppTitle extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          'Laporkan. Pantau. Perbaiki.',
+          'See it, Report it, Stay safe.',
           style: AppTextStyles.bodyMedium.copyWith(
             color: Colors.white.withValues(alpha: 0.80),
           ),
