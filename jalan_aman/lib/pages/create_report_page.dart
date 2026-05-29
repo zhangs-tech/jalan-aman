@@ -10,6 +10,7 @@ import 'package:jalan_aman/providers/location_providers.dart';
 import 'package:jalan_aman/services/address_service.dart';
 import 'package:jalan_aman/services/report_service.dart';
 import 'package:jalan_aman/theme/theme.dart';
+import 'package:jalan_aman/utils/distance_utils.dart';
 import 'package:latlong2/latlong.dart';
 
 class CreateReportPage extends ConsumerStatefulWidget {
@@ -32,14 +33,11 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
   String? _photoMimeType;
   bool _isSubmitting = false;
   bool _isAddressLoading = false;
-  bool _hasLoadedInitialAddress = false;
 
   @override
   void initState() {
     super.initState();
     _descriptionController.addListener(_onFieldChanged);
-    _addressController.addListener(_onFieldChanged);
-    _zipCodeController.addListener(_onFieldChanged);
   }
 
   @override
@@ -69,15 +67,48 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
     _photoMimeType = null;
   });
 
+  bool _hasPositionChanged(LatLng position) {
+    final current = _position;
+    if (current == null) return true;
+    return distanceInKm(
+          startLat: current.latitude,
+          startLng: current.longitude,
+          endLat: position.latitude,
+          endLng: position.longitude,
+        ) >=
+        0.01;
+  }
+
+  void _syncDetectedPosition(LatLng? detectedPosition) {
+    if (detectedPosition == null || !_hasPositionChanged(detectedPosition)) {
+      return;
+    }
+
+    _position = detectedPosition;
+    _addressController.clear();
+    _zipCodeController.clear();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _refreshAddressForPosition(detectedPosition);
+      }
+    });
+  }
+
   Future<void> _refreshAddressFromCurrentPosition() async {
-    if (_position == null) return;
-    final position = _position!;
+    final position = _position;
+    if (position == null) return;
+    await _refreshAddressForPosition(position);
+  }
+
+  Future<void> _refreshAddressForPosition(LatLng position) async {
     setState(() => _isAddressLoading = true);
     final result = await AddressService.getAddress(
       position.latitude,
       position.longitude,
     );
     if (!mounted) return;
+    if (_hasPositionChanged(position)) return;
     setState(() {
       if (result != null) {
         _addressController.text = result.address.trim().isEmpty
@@ -212,19 +243,7 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
           onRetry: () => ref.invalidate(currentPositionProvider),
         ),
         data: (detectedPosition) {
-          if (_position == null && detectedPosition != null) {
-            _position = detectedPosition;
-            _addressController.clear();
-            _zipCodeController.clear();
-            if (!_hasLoadedInitialAddress) {
-              _hasLoadedInitialAddress = true;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                  _refreshAddressFromCurrentPosition();
-                }
-              });
-            }
-          }
+          _syncDetectedPosition(detectedPosition);
 
           return Form(
             key: _formKey,

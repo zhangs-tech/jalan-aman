@@ -64,16 +64,23 @@ class PublicReportsNotifier extends StateNotifier<PublicReportsState> {
 
   static const _nearbyPageSize = 20;
   static const _serverPageLimit = 50;
+  int _loadGeneration = 0;
 
   Future<void> setCenter({
     required double latitude,
     required double longitude,
   }) async {
     final changed = state.centerLat != latitude || state.centerLng != longitude;
-    state = state.copyWith(centerLat: latitude, centerLng: longitude);
-    if (changed) {
-      await loadInitial();
-    }
+    if (!changed) return;
+
+    state = state.copyWith(
+      centerLat: latitude,
+      centerLng: longitude,
+      items: const <NearbyReportItem>[],
+      clearNextCursor: true,
+      clearError: true,
+    );
+    await loadInitial();
   }
 
   Future<void> setRadius(double radiusKm) async {
@@ -99,17 +106,18 @@ class PublicReportsNotifier extends StateNotifier<PublicReportsState> {
 
   Future<void> loadInitial() async {
     if (!mounted) return;
+    final generation = ++_loadGeneration;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final page = await _loadNearbyPage();
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       state = state.copyWith(
         isLoading: false,
         items: page.items,
         nextCursor: page.nextCursor,
       );
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       state = state.copyWith(isLoading: false, error: error.toString());
     }
   }
@@ -118,17 +126,18 @@ class PublicReportsNotifier extends StateNotifier<PublicReportsState> {
     if (!mounted || state.isLoading || state.isLoadingMore || !state.hasMore) {
       return;
     }
+    final generation = _loadGeneration;
     state = state.copyWith(isLoadingMore: true, clearError: true);
     try {
       final page = await _loadNearbyPage(cursor: state.nextCursor);
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       state = state.copyWith(
         isLoadingMore: false,
         items: <NearbyReportItem>[...state.items, ...page.items],
         nextCursor: page.nextCursor,
       );
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       state = state.copyWith(isLoadingMore: false, error: error.toString());
     }
   }
