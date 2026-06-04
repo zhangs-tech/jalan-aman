@@ -298,7 +298,6 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
   }
 }
 
-// ── Location error ──────────────────────────────────────────────
 class _LocationError extends StatelessWidget {
   const _LocationError({required this.onRetry});
   final VoidCallback onRetry;
@@ -334,7 +333,6 @@ class _LocationError extends StatelessWidget {
   }
 }
 
-// ── Section label ────────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel({required this.text});
   final String text;
@@ -394,7 +392,6 @@ class _CreateHeader extends StatelessWidget {
   }
 }
 
-// ── Report type grid ─────────────────────────────────────────────
 class _ReportTypeGrid extends StatelessWidget {
   const _ReportTypeGrid({required this.selectedType, required this.onSelected});
   final ReportType? selectedType;
@@ -473,7 +470,6 @@ class _TypePill extends StatelessWidget {
   }
 }
 
-// ── Description field ────────────────────────────────────────────
 class _DescriptionField extends StatefulWidget {
   const _DescriptionField({required this.controller});
   final TextEditingController controller;
@@ -547,7 +543,6 @@ class _DescriptionFieldState extends State<_DescriptionField> {
   }
 }
 
-// ── Photo section ────────────────────────────────────────────────
 class _PhotoSection extends StatelessWidget {
   const _PhotoSection({
     required this.photo,
@@ -642,7 +637,6 @@ class _PhotoSection extends StatelessWidget {
   }
 }
 
-// ── Map picker ───────────────────────────────────────────────────
 class _MapPicker extends StatefulWidget {
   const _MapPicker({
     super.key,
@@ -707,8 +701,6 @@ class _MapPickerState extends State<_MapPicker> {
     );
   }
 }
-
-// ── Location fields ──────────────────────────────────────────────
 class _LocationFields extends StatelessWidget {
   const _LocationFields({
     required this.addressController,
@@ -818,7 +810,6 @@ class _ReadOnlyRow extends StatelessWidget {
   }
 }
 
-// ── Submit button ────────────────────────────────────────────────
 class _SubmitButton extends StatelessWidget {
   const _SubmitButton({required this.isLoading, required this.onPressed});
   final bool isLoading;

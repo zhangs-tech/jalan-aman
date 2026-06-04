@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Jalan Aman — Design Token Colors
-/// Source: design spec v1
 abstract final class AppColors {
-  // ─── Brand ────────────────────────────────────────────────
+  // main 
   static const Color primary = Color(0xFF1A6B3C);
   static const Color primaryLight = Color(0xFF2E8F54);
   static const Color primaryDark = Color(0xFF104828);
@@ -12,7 +10,7 @@ abstract final class AppColors {
   static const Color accentLight = Color(0xFFFBCC78);
   static const Color accentDark = Color(0xFFB87718);
 
-  // ─── Semantic ─────────────────────────────────────────────
+  // semantic
   static const Color danger = Color(0xFFD0021B);
   static const Color dangerBackground = Color(0xFFFEE2E2);
 
@@ -25,7 +23,7 @@ abstract final class AppColors {
   static const Color info = Color(0xFF1D4ED8);
   static const Color infoBackground = Color(0xFFDBEAFE);
 
-  // ─── Neutral ──────────────────────────────────────────────
+  // neutral
   static const Color background = Color(0xFFF4F6F5);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceVariant = Color(0xFFE8EEE9);
@@ -40,6 +38,6 @@ abstract final class AppColors {
 
   static const Color divider = Color(0xFFF0F3F1);
 
-  // ─── Shadow ───────────────────────────────────────────────
+  // shadow
   static const Color shadowColor = Color(0x0F000000); // rgba(0,0,0,0.06)
 }

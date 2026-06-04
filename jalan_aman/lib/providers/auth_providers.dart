@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jalan_aman/services/api/auth_service.dart';
+import 'package:jalan_aman/services/auth_service.dart';
 import 'package:jalan_aman/services/secure_storage.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }

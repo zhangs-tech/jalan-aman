@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Jalan Aman — Spacing tokens
+// spacing
 abstract final class AppSpacing {
   static const double xs = 4.0;
   static const double sm = 8.0;
@@ -12,7 +12,7 @@ abstract final class AppSpacing {
   static const double xxl = 32.0;
   static const double xxxl = 48.0;
 
-  // Page horizontal padding
+  // horizontal padding
   static const EdgeInsets pagePadding =
       EdgeInsets.symmetric(horizontal: base);
 
@@ -22,7 +22,7 @@ abstract final class AppSpacing {
       EdgeInsets.symmetric(horizontal: base, vertical: md);
 }
 
-/// Jalan Aman — Border radius tokens
+// border radius 
 abstract final class AppRadius {
   static const double xs = 4.0;
   static const double sm = 8.0;   // inputs, small chips
@@ -46,7 +46,7 @@ abstract final class AppRadius {
   );
 }
 
-/// Jalan Aman — Shadow tokens
+// shadows
 abstract final class AppShadows {
   /// Default card shadow: `0 2px 12px rgba(0,0,0,0.06)`
   static const List<BoxShadow> card = [
@@ -57,7 +57,7 @@ abstract final class AppShadows {
     ),
   ];
 
-  /// Elevated shadow for FABs and bottom sheets
+  // elevated shadow for FAB and bottom sheets
   static const List<BoxShadow> elevated = [
     BoxShadow(
       color: Color(0x14000000),
@@ -66,7 +66,7 @@ abstract final class AppShadows {
     ),
   ];
 
-  /// Subtle border-like shadow for search bars floating over map
+  // border-like shadow
   static const List<BoxShadow> overlay = [
     BoxShadow(
       color: Color(0x1A000000),

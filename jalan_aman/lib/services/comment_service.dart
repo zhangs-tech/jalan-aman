@@ -1,5 +1,5 @@
 import 'package:jalan_aman/models/report_models.dart';
-import 'package:jalan_aman/services/api/api_client.dart';
+import 'package:jalan_aman/services/api_client.dart';
 
 class CommentService {
   static Future<CursorPage<ReportComment>> getByReportId({

@@ -4,15 +4,6 @@ import 'app_colors.dart';
 import 'app_dimensions.dart';
 import 'app_text_styles.dart';
 
-/// Jalan Aman — Main ThemeData
-///
-/// Usage in main.dart:
-/// ```dart
-/// MaterialApp(
-///   theme: AppTheme.light,
-///   ...
-/// )
-/// ```
 abstract final class AppTheme {
   static ThemeData get light {
     final base = ThemeData(
@@ -25,7 +16,7 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
       splashFactory: InkRipple.splashFactory,
 
-      // ── AppBar ────────────────────────────────────────────
+      // appBar
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -46,7 +37,7 @@ abstract final class AppTheme {
         ),
       ),
 
-      // ── Bottom Sheet ──────────────────────────────────────
+      // bottom Sheet
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         modalBackgroundColor: AppColors.surface,
@@ -59,7 +50,7 @@ abstract final class AppTheme {
         clipBehavior: Clip.antiAlias,
       ),
 
-      // ── Cards ─────────────────────────────────────────────
+      // cards
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -72,7 +63,7 @@ abstract final class AppTheme {
         clipBehavior: Clip.antiAlias,
       ),
 
-      // ── Buttons ───────────────────────────────────────────
+      // buttons
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -126,7 +117,7 @@ abstract final class AppTheme {
         ),
       ),
 
-      // ── FAB ───────────────────────────────────────────────
+      // floating act btn
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textInverse,
@@ -138,7 +129,7 @@ abstract final class AppTheme {
         sizeConstraints: BoxConstraints.tightFor(width: 52, height: 52),
       ),
 
-      // ── Input fields ──────────────────────────────────────
+      // input fields
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
@@ -146,7 +137,7 @@ abstract final class AppTheme {
           horizontal: AppSpacing.base,
           vertical: AppSpacing.md,
         ),
-        // Default border
+        // default
         border: OutlineInputBorder(
           borderRadius: AppRadius.inputRadius,
           borderSide: const BorderSide(color: AppColors.border, width: 1),
@@ -155,12 +146,12 @@ abstract final class AppTheme {
           borderRadius: AppRadius.inputRadius,
           borderSide: const BorderSide(color: AppColors.border, width: 1),
         ),
-        // Focus: green 2px
+        // focus
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.inputRadius,
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
-        // Error: red
+        // error
         errorBorder: OutlineInputBorder(
           borderRadius: AppRadius.inputRadius,
           borderSide: const BorderSide(color: AppColors.danger, width: 1),
@@ -189,7 +180,7 @@ abstract final class AppTheme {
         suffixIconColor: AppColors.textSecondary,
       ),
 
-      // ── Chips (filter pills) ──────────────────────────────
+      // chips
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surface,
         selectedColor: AppColors.primary,
@@ -206,14 +197,14 @@ abstract final class AppTheme {
         showCheckmark: false,
       ),
 
-      // ── Divider ───────────────────────────────────────────
+      // divider
       dividerTheme: const DividerThemeData(
         color: AppColors.divider,
         thickness: 1,
         space: 1,
       ),
 
-      // ── List Tile ─────────────────────────────────────────
+      // list tile 
       listTileTheme: const ListTileThemeData(
         contentPadding: EdgeInsets.symmetric(
           horizontal: AppSpacing.base,
@@ -226,7 +217,7 @@ abstract final class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: AppRadius.cardRadius),
       ),
 
-      // ── Snackbar ──────────────────────────────────────────
+      // snackbar 
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimary,
         contentTextStyle: AppTextStyles.bodySmall.copyWith(
@@ -239,27 +230,27 @@ abstract final class AppTheme {
         elevation: 4,
       ),
 
-      // ── Progress Indicator ────────────────────────────────
+      // progress indicator 
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
         linearTrackColor: AppColors.divider,
         circularTrackColor: AppColors.divider,
       ),
 
-      // ── Icon ─────────────────────────────────────────────
+      // icon 
       iconTheme: const IconThemeData(
         color: AppColors.textSecondary,
         size: 20,
       ),
 
-      // ── Text Selection ────────────────────────────────────
+      // text selection
       textSelectionTheme: const TextSelectionThemeData(
         cursorColor: AppColors.primary,
         selectionColor: Color(0x331A6B3C),
         selectionHandleColor: AppColors.primary,
       ),
 
-      // ── Typography ────────────────────────────────────────
+      // typography
       textTheme: const TextTheme(
         displayLarge: AppTextStyles.displayLarge,
         displayMedium: AppTextStyles.displayMedium,
@@ -276,7 +267,7 @@ abstract final class AppTheme {
     );
   }
 
-  // ── Color Scheme ────────────────────────────────────────────
+  // color scheme
   static const ColorScheme _colorScheme = ColorScheme(
     brightness: Brightness.light,
     primary: AppColors.primary,

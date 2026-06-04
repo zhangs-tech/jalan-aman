@@ -146,7 +146,6 @@ class _FormCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: AppSpacing.md),
-            //Title
             Text(
               'Login to existing account',
               style: AppTextStyles.h1,
@@ -158,11 +157,9 @@ class _FormCard extends StatelessWidget {
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),
-              // textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            //Fields
             ModifiedTextField(
               label: "Email",
               controller: emailController,

@@ -31,6 +31,7 @@ class _MapPageState extends ConsumerState<MapPage> {
   final MapController _mapController = MapController();
   Timer? _boundsDebounce;
 
+  //init to jakarta 
   LatLng _currentPosition = const LatLng(-6.2088, 106.8456);
   MapBoundsModel? _bounds;
   ReportType? _selectedType;

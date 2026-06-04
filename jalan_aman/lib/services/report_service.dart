@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:jalan_aman/models/map_bounds.dart';
 import 'package:jalan_aman/models/report_models.dart';
-import 'package:jalan_aman/services/api/api_client.dart';
+import 'package:jalan_aman/services/api_client.dart';
 
 class ReportService {
   static Future<Map<String, dynamic>> create({

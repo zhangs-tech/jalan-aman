@@ -11,7 +11,7 @@ class LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Force light status bar icons on dark green background
+    // force light status bar icons on dark green background
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -26,7 +26,7 @@ class LandingPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Column(
             children: [
-              // Center content
+              // center content
               const Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +38,7 @@ class LandingPage extends StatelessWidget {
                 ),
               ),
 
-              // Bottom buttons
+              // bottom buttons
               Column(
                 children: [
                   Buttons(

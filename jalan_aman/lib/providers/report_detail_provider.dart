@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jalan_aman/models/report_models.dart';
-import 'package:jalan_aman/services/api/api_client.dart';
+import 'package:jalan_aman/services/api_client.dart';
 import 'package:jalan_aman/services/report_service.dart';
 
 /// Holds the report detail together with auth headers and the resolved

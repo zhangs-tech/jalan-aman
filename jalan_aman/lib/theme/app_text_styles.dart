@@ -1,25 +1,12 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Jalan Aman — Typography
-///
-/// Headings  → Plus Jakarta Sans (Bold / SemiBold)
-/// Body      → DM Sans (Regular / Medium)
-///
-/// Add to pubspec.yaml:
-/// ```yaml
-/// dependencies:
-///   google_fonts: ^6.2.1
-/// ```
-/// Then replace FontFamily.heading / body constants with:
-///   GoogleFonts.plusJakartaSansTextTheme()
-///   GoogleFonts.dmSansTextTheme()
 abstract final class AppTextStyles {
-  // Font family fallbacks (swap with GoogleFonts in main.dart)
+  // font family fallbacks
   static const String _heading = 'PlusJakartaSans';
   static const String _body = 'DMSans';
 
-  // ─── Display ──────────────────────────────────────────────
+  // display 
   static const TextStyle displayLarge = TextStyle(
     fontFamily: _heading,
     fontSize: 32,
@@ -38,7 +25,7 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  // ─── Headings ─────────────────────────────────────────────
+  // headings
   static const TextStyle h1 = TextStyle(
     fontFamily: _heading,
     fontSize: 22,
@@ -63,7 +50,7 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  // ─── Body ─────────────────────────────────────────────────
+  // body
   static const TextStyle bodyLarge = TextStyle(
     fontFamily: _body,
     fontSize: 16,
@@ -88,7 +75,7 @@ abstract final class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  // ─── Labels / UI ──────────────────────────────────────────
+  // labels
   static const TextStyle labelLarge = TextStyle(
     fontFamily: _body,
     fontSize: 14,
@@ -114,7 +101,7 @@ abstract final class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  // ─── Button ───────────────────────────────────────────────
+  // button
   static const TextStyle button = TextStyle(
     fontFamily: _body,
     fontSize: 15,
@@ -123,7 +110,7 @@ abstract final class AppTextStyles {
     letterSpacing: 0.1,
   );
 
-  // ─── Caption / Overline ───────────────────────────────────
+  // caption 
   static const TextStyle caption = TextStyle(
     fontFamily: _body,
     fontSize: 11,
@@ -141,7 +128,6 @@ abstract final class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  // ─── Convenience modifiers ────────────────────────────────
   static TextStyle colored(TextStyle base, Color color) =>
       base.copyWith(color: color);
 }
