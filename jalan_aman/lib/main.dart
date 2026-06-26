@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
       title: 'Jalan Aman',
       theme: theme.copyWith(textTheme: textTheme),
       home: const _AuthGate(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -61,9 +62,7 @@ class _AuthGateState extends ConsumerState<_AuthGate> {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: AppColors.primary,
-      body: Center(
-        child: AppIcon(),
-      ),
+      body: Center(child: AppIcon()),
     );
   }
 }
