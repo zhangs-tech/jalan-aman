@@ -176,7 +176,7 @@ class _FormCard extends StatelessWidget {
               hint: "Enter your password",
               prefixIcon: Icons.lock_outline_rounded,
               obscureText: obscurePassword,
-              validator: validatePassword,
+              validator: validateEmpty,
               suffixIcon: IconButton(
                 icon: Icon(
                   obscurePassword

@@ -45,3 +45,11 @@ String? validatePassword(String? value) {
     return null;
   }
 }
+
+String? validateEmpty(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Please enter password';
+  } else {
+    return null;
+  }
+}
