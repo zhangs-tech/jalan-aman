@@ -6,6 +6,12 @@ Jalan Aman is a community road-safety reporting app. The repository contains:
 - `jalan_aman/`: Flutter mobile app that consumes the backend API.
 - `docs/`: use-case, lifecycle, ERD, and project report documentation.
 
+## Contributors
+
+- Danielson (@orde-r)
+- Jeremy Auriel Zhang (@jeremzhg)
+- Kristopher Nathanael (@KrisNathan)
+
 ## Prerequisites
 
 Install these before starting the app:
