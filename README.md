@@ -8,9 +8,9 @@ Jalan Aman is a community road-safety reporting app. The repository contains:
 
 ## Contributors
 
-- Danielson (@orde-r)
-- Jeremy Auriel Zhang (@jeremzhg)
-- Kristopher Nathanael (@KrisNathan)
+- Danielson ([@orde-r](https://github.com/orde-r))
+- Jeremy Auriel Zhang ([@jeremzhg](https://github.com/jeremzhg))
+- Kristopher Nathanael ([@KrisNathan](https://github.com/KrisNathan))
 
 ## Prerequisites
 
